@@ -19,33 +19,3 @@ binary_sensor:
           id: living_btn
           state:
             checked: !lambda return x;
-
-  - platform: homeassistant
-    id: hall_light_state
-    entity_id: light.hall
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: hall_btn
-          state:
-            checked: !lambda return x;
-
-  - platform: homeassistant
-    id: downstairs_light_state
-    entity_id: light.downstairs
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: downstairs_btn
-          state:
-            checked: !lambda return x;
-
-  - platform: homeassistant
-    id: garden_light_state
-    entity_id: light.garden_lights
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: garden_btn
-          state:
-            checked: !lambda return x;
