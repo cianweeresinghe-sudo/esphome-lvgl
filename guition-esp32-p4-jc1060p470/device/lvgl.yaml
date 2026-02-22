@@ -2,10 +2,28 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+  ################################################
+  # TOP STATUS BAR (required by time.yaml)
+  ################################################
+
+  top_layer:
+    widgets:
+      - label:
+          id: display_time
+          text: "--:--"
+          align: top_mid
+          y: 8
+          text_color: 0xFFFFFF
+
+  ################################################
+  # MAIN PAGE
+  ################################################
+
   pages:
     - id: main_page
       bg_color: 0x000000
       pad_all: 20
+      pad_top: 50   # leave space for clock
 
       layout:
         type: flex
