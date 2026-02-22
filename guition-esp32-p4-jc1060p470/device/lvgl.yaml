@@ -1,11 +1,16 @@
 lvgl:
-  displays: my_display
+
+  ################################################
+  # IMPORTANT — binds LVGL to the MIPI display
+  ################################################
+  displays:
+    - my_display
+
   byte_order: little_endian
 
   ################################################
-  # TOP STATUS BAR (required by time.yaml)
+  # TOP CLOCK (required by time addon)
   ################################################
-
   top_layer:
     widgets:
       - label:
@@ -18,12 +23,11 @@ lvgl:
   ################################################
   # MAIN PAGE
   ################################################
-
   pages:
     - id: main_page
       bg_color: 0x000000
       pad_all: 20
-      pad_top: 50   # leave space for clock
+      pad_top: 50
 
       layout:
         type: flex
@@ -62,48 +66,3 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.living_room
-
-        - button:
-            id: hall_btn
-            width: 220
-            height: 140
-            checkable: true
-            widgets:
-              - label:
-                  text: "Hall"
-                  align: center
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.hall
-
-        - button:
-            id: downstairs_btn
-            width: 220
-            height: 140
-            checkable: true
-            widgets:
-              - label:
-                  text: "Downstairs"
-                  align: center
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.downstairs
-
-        - button:
-            id: garden_btn
-            width: 220
-            height: 140
-            checkable: true
-            widgets:
-              - label:
-                  text: "Garden"
-                  align: center
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.garden_lights
