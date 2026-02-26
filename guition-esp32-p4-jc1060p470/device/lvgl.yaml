@@ -1,4 +1,36 @@
 lvgl:
+  displays: my_display
+  byte_order: little_endian
+
+  # ------------------------------------------------
+  # TOP STATUS BAR (REQUIRED BY PACKAGE)
+  # ------------------------------------------------
+  top_layer:
+    widgets:
+
+      # Temperature header (optional but kept)
+      - label:
+          id: temperatures
+          text: "--° / --°"
+          align: top_left
+          x: 8
+          y: 8
+          text_color: 0xFFFFFF
+
+      # CLOCK (REQUIRED — fixes your error)
+      - label:
+          id: display_time
+          text: "--:--"
+          align: top_mid
+          x: 0
+          y: 8
+          text_align: center
+          text_color: 0xFFFFFF
+
+
+  # ------------------------------------------------
+  # PAGES
+  # ------------------------------------------------
   pages:
 
     - id: home_summary_page
