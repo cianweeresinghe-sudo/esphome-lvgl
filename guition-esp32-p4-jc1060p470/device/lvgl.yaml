@@ -13,7 +13,7 @@ lvgl:
 
       widgets:
 
-        # LIGHTS
+        # -------- LIGHTS --------
         - button:
             id: living_light_btn
             checkable: true
@@ -63,7 +63,7 @@ lvgl:
                     entity_id: light.garden_lights
 
 
-        # TEMPERATURES
+        # -------- TEMPERATURE --------
         - button:
             styles: control
             widgets:
@@ -83,7 +83,7 @@ lvgl:
                   text: "--.-°C"
 
 
-        # ENERGY
+        # -------- ENERGY --------
         - button:
             styles: control
             widgets:
@@ -112,7 +112,7 @@ lvgl:
                   text: "--%"
 
 
-        # WEATHER
+        # -------- WEATHER --------
         - button:
             styles: control
             widgets:
@@ -132,7 +132,7 @@ lvgl:
                   text: "--"
 
 
-        # SONOS
+        # -------- SONOS --------
         - button:
             styles: control
             widgets:
