@@ -1,30 +1,32 @@
+##################################################
+# HOME ASSISTANT SENSORS
+##################################################
+
 sensor:
 
-  # ---------------- TEMPERATURES ----------------
+  ##################################################
+  # TOP BAR TEMPERATURES
+  ##################################################
+
+  # Indoor (Kitchen Echo)
   - platform: homeassistant
-    id: living_temp
-    entity_id: climate.smart_radiator_thermostat_x
-    attribute: current_temperature
+    id: header_indoor_temp
+    entity_id: sensor.family_s_echo_temperature
     on_value:
-      - lvgl.label.update:
-          id: living_temp_label
-          text:
-            format: "%.1f°C"
-            args: [ 'x' ]
+      - script.execute: update_header_temp
 
+  # Outdoor (weather entity STATE)
   - platform: homeassistant
-    id: house_temp
-    entity_id: climate.wireless_temperature_sensor_x
-    attribute: current_temperature
+    id: header_outdoor_temp
+    entity_id: weather.forecast_home
     on_value:
-      - lvgl.label.update:
-          id: house_temp_label
-          text:
-            format: "%.1f°C"
-            args: [ 'x' ]
+      - script.execute: update_header_temp
 
 
-  # ---------------- ENERGY ----------------
+  ##################################################
+  # ENERGY
+  ##################################################
+
   - platform: homeassistant
     id: solar_today
     entity_id: sensor.solar_daily_production_kwh
@@ -56,32 +58,27 @@ sensor:
             args: [ 'x' ]
 
 
-# ---------------- TEXT ----------------
-text_sensor:
+##################################################
+# WEATHER TEXT + ICON
+##################################################
 
-  - platform: homeassistant
-    id: rain_status_text
-    entity_id: sensor.rain_status_text
-    on_value:
-      - lvgl.label.update:
-          id: rain_label
-          text: !lambda return x;
+text_sensor:
 
   - platform: homeassistant
     id: weather_condition
     entity_id: weather.forecast_home
-    attribute: condition
     on_value:
-      - lvgl.label.update:
-          id: weather_label
-          text: !lambda return x;
+      - script.execute: update_weather_ui
 
 
-# ---------------- LIGHT STATES ----------------
+##################################################
+# LIGHT STATES
+##################################################
+
 binary_sensor:
 
   - platform: homeassistant
-    id: living_room_light_state
+    id: living_light_state
     entity_id: light.living_room
     trigger_on_initial_state: true
     on_state:
@@ -119,3 +116,50 @@ binary_sensor:
           id: garden_light_btn
           state:
             checked: !lambda return x;
+
+
+##################################################
+# SCRIPTS
+##################################################
+
+script:
+
+  # Update header temperatures safely
+  - id: update_header_temp
+    then:
+      - lvgl.label.update:
+          id: temperatures
+          text: !lambda |-
+            char buf[32];
+            snprintf(buf,sizeof(buf),"%d° / %d°",
+              (int)round(id(header_indoor_temp).state),
+              (int)round(id(header_outdoor_temp).state));
+            return buf;
+
+
+  # Weather icon + colour logic
+  - id: update_weather_ui
+    then:
+      - lambda: |-
+          std::string cond = id(weather_condition).state;
+
+          std::string icon = "\uF059";   // default
+          lv_color_t color = lv_color_hex(0xAAAAAA);
+
+          if (cond == "sunny" || cond == "clear-night") {
+            icon = "\uF185"; // sun
+            color = lv_color_hex(0xFFD54A);
+          } else if (cond == "cloudy" || cond == "partlycloudy") {
+            icon = "\uF0C2"; // cloud
+            color = lv_color_hex(0xCCCCCC);
+          } else if (cond == "rainy") {
+            icon = "\uF73D"; // rain
+            color = lv_color_hex(0x4FC3F7);
+          } else if (cond == "snowy") {
+            icon = "\uF2DC"; // snow
+            color = lv_color_hex(0xB3E5FC);
+          }
+
+          lv_label_set_text(id(weather_icon), icon.c_str());
+          lv_obj_set_style_text_color(id(weather_icon), color, 0);
+          lv_label_set_text(id(weather_label), cond.c_str());
