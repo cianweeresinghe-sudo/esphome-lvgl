@@ -1,68 +1,150 @@
 lvgl:
-
-  ################################################
-  # IMPORTANT — binds LVGL to the MIPI display
-  ################################################
-  displays:
-    - my_display
-
-  byte_order: little_endian
-
-  ################################################
-  # TOP CLOCK (required by time addon)
-  ################################################
-  top_layer:
-    widgets:
-      - label:
-          id: display_time
-          text: "--:--"
-          align: top_mid
-          y: 8
-          text_color: 0xFFFFFF
-
-  ################################################
-  # MAIN PAGE
-  ################################################
   pages:
-    - id: main_page
-      bg_color: 0x000000
-      pad_all: 20
-      pad_top: 50
 
+    - id: home_summary_page
       layout:
         type: flex
-        flex_flow: row_wrap
-        pad_row: 15
-        pad_column: 15
+        flex_flow: column_wrap
+        pad_row: 10
+        pad_column: 10
+      width: 100%
+      bg_color: Black
+      pad_top: 42
 
       widgets:
 
+        # LIGHTS
         - button:
-            id: kitchen_btn
-            width: 220
-            height: 140
+            id: living_light_btn
             checkable: true
+            styles: control
             widgets:
-              - label:
-                  text: "Kitchen"
-                  align: center
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.kitchen
-
-        - button:
-            id: living_btn
-            width: 220
-            height: 140
-            checkable: true
-            widgets:
-              - label:
-                  text: "Living Room"
-                  align: center
+              - label: { text: "Living" }
             on_click:
               - homeassistant.service:
                   service: light.toggle
                   data:
                     entity_id: light.living_room
+
+        - button:
+            id: hall_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Hall" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: light.hall
+
+        - button:
+            id: downstairs_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Downstairs" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: light.downstairs
+
+        - button:
+            id: garden_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Garden" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data:
+                    entity_id: light.garden_lights
+
+
+        # TEMPERATURES
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Living Temp" }
+              - label:
+                  id: living_temp_label
+                  align: bottom_left
+                  text: "--.-°C"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "House Temp" }
+              - label:
+                  id: house_temp_label
+                  align: bottom_left
+                  text: "--.-°C"
+
+
+        # ENERGY
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Solar" }
+              - label:
+                  id: solar_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Car" }
+              - label:
+                  id: car_label
+                  align: bottom_left
+                  text: "--%"
+
+
+        # WEATHER
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_label
+                  align: bottom_left
+                  text: "--"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Weather" }
+              - label:
+                  id: weather_label
+                  align: bottom_left
+                  text: "--"
+
+
+        # SONOS
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Radio 1" }
+            on_click:
+              - homeassistant.service:
+                  service: script.sonos_favourite_radio_1
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Radio 2" }
+            on_click:
+              - homeassistant.service:
+                  service: script.sonos_favourite_radio_2
