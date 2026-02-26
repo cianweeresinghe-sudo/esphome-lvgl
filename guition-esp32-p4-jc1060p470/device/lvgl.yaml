@@ -26,7 +26,7 @@ lvgl:
         pad_row: 10
         pad_column: 10
       width: 100%
-      bg_color: Black
+      bg_color: black
       pad_top: 42
 
       widgets:
@@ -77,14 +77,64 @@ lvgl:
                   data: { entity_id: light.garden_lights }
 
 
+        # ---------- THERMOSTATS ----------
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Living" }
+              - label:
+                  id: living_target_label
+                  align: bottom_left
+                  text: "--.-°C"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "House" }
+              - label:
+                  id: house_target_label
+                  align: bottom_left
+                  text: "--.-°C"
+
+
+        # ---------- ENERGY ----------
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Solar" }
+              - label:
+                  id: solar_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Car" }
+              - label:
+                  id: car_label
+                  align: bottom_left
+                  text: "--%"
+
+
         # ---------- WEATHER ----------
         - button:
             styles: control
             widgets:
               - label:
                   id: weather_icon
-                  text_font: icon_font_large
+                  text_font: icon_font   # ✅ correct font
                   text: "\uF059"
+
               - label:
                   id: weather_label
                   align: bottom_left
