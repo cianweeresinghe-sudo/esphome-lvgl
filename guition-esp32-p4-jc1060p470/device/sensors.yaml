@@ -1,6 +1,6 @@
 sensor:
 
-  # ---------- TEMPERATURES ----------
+  # ---------------- TEMPERATURES ----------------
   - platform: homeassistant
     id: living_temp
     entity_id: climate.smart_radiator_thermostat_x
@@ -24,7 +24,7 @@ sensor:
             args: [ 'x' ]
 
 
-  # ---------- ENERGY ----------
+  # ---------------- ENERGY ----------------
   - platform: homeassistant
     id: solar_today
     entity_id: sensor.solar_daily_production_kwh
@@ -56,10 +56,11 @@ sensor:
             args: [ 'x' ]
 
 
+# ---------------- TEXT ----------------
 text_sensor:
 
   - platform: homeassistant
-    id: rain_status
+    id: rain_status_text
     entity_id: sensor.rain_status_text
     on_value:
       - lvgl.label.update:
@@ -76,10 +77,11 @@ text_sensor:
           text: !lambda return x;
 
 
+# ---------------- LIGHT STATES ----------------
 binary_sensor:
 
-  # ---------- LIGHT STATES ----------
   - platform: homeassistant
+    id: living_room_light_state
     entity_id: light.living_room
     trigger_on_initial_state: true
     on_state:
@@ -89,6 +91,7 @@ binary_sensor:
             checked: !lambda return x;
 
   - platform: homeassistant
+    id: hall_light_state
     entity_id: light.hall
     trigger_on_initial_state: true
     on_state:
@@ -98,6 +101,7 @@ binary_sensor:
             checked: !lambda return x;
 
   - platform: homeassistant
+    id: downstairs_light_state
     entity_id: light.downstairs
     trigger_on_initial_state: true
     on_state:
@@ -107,6 +111,7 @@ binary_sensor:
             checked: !lambda return x;
 
   - platform: homeassistant
+    id: garden_light_state
     entity_id: light.garden_lights
     trigger_on_initial_state: true
     on_state:
