@@ -3,7 +3,7 @@ lvgl:
   byte_order: little_endian
 
 ##################################################
-# TOP BAR
+# TOP BAR (required by package)
 ##################################################
 
   top_layer:
@@ -15,14 +15,12 @@ lvgl:
           align: top_left
           x: 8
           y: 8
-          text_color: 0xFFFFFF
 
       - label:
           id: display_time
           text: "--:--"
           align: top_mid
           y: 8
-          text_color: 0xFFFFFF
 
 
 ##################################################
@@ -30,7 +28,6 @@ lvgl:
 ##################################################
 
   pages:
-
     - id: home_summary_page
       layout:
         type: flex
@@ -44,52 +41,81 @@ lvgl:
       widgets:
 
         ##################################################
-        # LIGHTS
+        # THERMOSTATS (CONTROL)
         ##################################################
 
         - button:
-            id: living_light_btn
-            checkable: true
             styles: control
             widgets:
               - label: { text: "Living" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.living_room }
+
+              - label:
+                  id: living_target_label
+                  align: center
+                  text: "--.-°C"
+
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_left
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state - 0.5;
+
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state + 0.5;
+
 
         - button:
-            id: hall_light_btn
-            checkable: true
             styles: control
             widgets:
-              - label: { text: "Hall" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.hall }
+              - label: { text: "House" }
 
-        - button:
-            id: downstairs_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Downstairs" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.downstairs }
+              - label:
+                  id: house_target_label
+                  align: center
+                  text: "--.-°C"
 
-        - button:
-            id: garden_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Garden" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.garden_lights }
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_left
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda return id(house_target_temp).state - 0.5;
+
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda return id(house_target_temp).state + 0.5;
 
 
         ##################################################
@@ -125,7 +151,7 @@ lvgl:
 
 
         ##################################################
-        # WEATHER (ICON + TEXT)
+        # WEATHER + RAIN
         ##################################################
 
         - button:
@@ -133,30 +159,19 @@ lvgl:
             widgets:
               - label:
                   id: weather_icon
-                  text_font: icon_font
+                  text_font: $icon_font
                   text: "\uF059"
+
               - label:
                   id: weather_label
                   align: bottom_left
                   text: "--"
 
-
-        ##################################################
-        # SONOS
-        ##################################################
-
         - button:
             styles: control
             widgets:
-              - label: { text: "Radio 1" }
-            on_click:
-              - homeassistant.service:
-                  service: script.sonos_favourite_radio_1
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Radio 2" }
-            on_click:
-              - homeassistant.service:
-                  service: script.sonos_favourite_radio_2
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_label
+                  align: bottom_left
+                  text: "--"
