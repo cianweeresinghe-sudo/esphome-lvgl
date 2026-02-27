@@ -2,8 +2,13 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+##################################################
+# TOP BAR
+##################################################
+
   top_layer:
     widgets:
+
       - label:
           id: temperatures
           text: "--° / --°"
@@ -18,6 +23,10 @@ lvgl:
           y: 8
 
 
+##################################################
+# MAIN PAGE
+##################################################
+
   pages:
     - id: home_summary_page
       layout:
@@ -31,120 +40,97 @@ lvgl:
 
       widgets:
 
-        # ---------- LIGHTS ----------
-        - button:
-            id: living_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Living" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.living_room }
+##################################################
+# LIVING LIGHT BRIGHTNESS
+##################################################
 
-        - button:
-            id: hall_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Hall" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.hall }
-
-        - button:
-            id: downstairs_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Downstairs" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.downstairs }
-
-        - button:
-            id: garden_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Garden" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.garden_lights }
-
-
-        # ---------- THERMOSTATS ----------
         - button:
             styles: control
             widgets:
-              - label: { text: "Living" }
-              - label:
-                  id: living_target_label
+              - label: { text: "Living Light" }
+
+              - button:
                   align: bottom_left
-                  text: "--.-°C"
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: light.turn_on
+                        data:
+                          entity_id: light.living_room
+                          brightness: !lambda return max(1,(int)id(living_brightness).state - 25);
+
+              - button:
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: light.turn_on
+                        data:
+                          entity_id: light.living_room
+                          brightness: !lambda return min(255,(int)id(living_brightness).state + 25);
+
+
+##################################################
+# THERMOSTAT CONTROL
+##################################################
 
         - button:
             styles: control
             widgets:
-              - label: { text: "House" }
-              - label:
-                  id: house_target_label
+              - label: { text: "Living Heat" }
+
+              - button:
                   align: bottom_left
-                  text: "--.-°C"
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state - 0.5;
+
+              - button:
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state + 0.5;
 
 
-        # ---------- ENERGY ----------
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Solar" }
-              - label:
-                  id: solar_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Usage" }
-              - label:
-                  id: usage_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Car" }
-              - label:
-                  id: car_label
-                  align: bottom_left
-                  text: "--%"
-
-
-        # ---------- WEATHER ----------
-        - button:
-            styles: control
-            widgets:
-              - label:
-                  id: weather_icon
-                  text_font: icon_font   # ✅ correct font
-                  text: "\uF059"
-
-              - label:
-                  id: weather_label
-                  align: bottom_left
-                  text: "--"
+##################################################
+# SONOS VOLUME
+##################################################
 
         - button:
             styles: control
             widgets:
-              - label: { text: "Rain" }
-              - label:
-                  id: rain_label
+              - label: { text: "Kitchen Audio" }
+
+              - button:
                   align: bottom_left
-                  text: "--"
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: media_player.volume_set
+                        data:
+                          entity_id: media_player.kitchen
+                          volume_level: !lambda return max(0.0f, id(kitchen_volume).state - 0.05f);
+
+              - button:
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: media_player.volume_set
+                        data:
+                          entity_id: media_player.kitchen
+                          volume_level: !lambda return min(1.0f, id(kitchen_volume).state + 0.05f);
