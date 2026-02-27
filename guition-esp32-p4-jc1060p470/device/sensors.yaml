@@ -1,8 +1,12 @@
 ##################################################
-# TEMPERATURE HEADER
+# HOME ASSISTANT SENSORS
 ##################################################
 
 sensor:
+
+##################################################
+# HEADER TEMPERATURES
+##################################################
 
   - platform: homeassistant
     id: indoor_temp
@@ -22,6 +26,7 @@ sensor:
 ##################################################
 
   - platform: homeassistant
+    id: solar_today
     entity_id: sensor.solar_daily_production_kwh
     on_value:
       - lvgl.label.update:
@@ -31,6 +36,7 @@ sensor:
             args: ['x']
 
   - platform: homeassistant
+    id: usage_today
     entity_id: sensor.envoy_122429013109_energy_consumption_today
     on_value:
       - lvgl.label.update:
@@ -40,6 +46,7 @@ sensor:
             args: ['x']
 
   - platform: homeassistant
+    id: car_battery
     entity_id: sensor.ky22mdv_battery
     on_value:
       - lvgl.label.update:
@@ -56,6 +63,7 @@ sensor:
 text_sensor:
 
   - platform: homeassistant
+    id: rain_status
     entity_id: sensor.rain_status_text
     on_value:
       - lvgl.label.update:
@@ -63,6 +71,7 @@ text_sensor:
           text: !lambda return x;
 
   - platform: homeassistant
+    id: weather_status
     entity_id: weather.forecast_home
     on_value:
       - lvgl.label.update:
@@ -71,7 +80,7 @@ text_sensor:
 
 
 ##################################################
-# HEADER UPDATE
+# HEADER UPDATE SCRIPT
 ##################################################
 
 script:
