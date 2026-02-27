@@ -65,7 +65,8 @@ globals:
 
   - id: screen_dimmed
     type: bool
-    initial_value: 'false'
+    restore_value: no
+    initial_value: "false"
 
 
 script:
@@ -79,7 +80,6 @@ script:
       - light.turn_on:
           id: display_backlight
           brightness: 100%
-          transition_length: 0s
 
       - delay: 5min
       - script.execute: screen_dim
@@ -92,8 +92,7 @@ script:
           if (!now.is_valid()) return;
 
           if (now.hour >= 23 || now.hour < 6) {
-            auto call = id(display_backlight).turn_off();
-            call.perform();
+            id(display_backlight).turn_off().perform();
             return;
           }
 
@@ -102,7 +101,6 @@ script:
       - light.turn_on:
           id: display_backlight
           brightness: 5%
-          transition_length: 1s
 
       - delay: 25min
       - script.execute: screen_off
@@ -110,9 +108,7 @@ script:
 
   - id: screen_off
     then:
-      - light.turn_off:
-          id: display_backlight
-          transition_length: 2s
+      - light.turn_off: display_backlight
   
 # Power management
 esp_ldo:
