@@ -302,6 +302,7 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
+                  
             on_click:
               - lvgl.widget.update:
                   id: control_overlay
@@ -315,8 +316,8 @@ lvgl:
               - lvgl.widget.update:
                   id: sonos_panel
                   hidden: true
-              - lvgl.widget.redraw: control_overlay
-            
+              - lvgl.widget.move_foreground: control_overlay   
+              
         - button:
             styles: control
             width: 210
@@ -343,8 +344,7 @@ lvgl:
               - lvgl.widget.update:
                   id: sonos_panel
                   hidden: true
-              - lvgl.widget.redraw: control_overlay
-         
+              - lvgl.widget.move_foreground: control_overlay         
 
         # ---------------- ENERGY ----------------
         - button:
