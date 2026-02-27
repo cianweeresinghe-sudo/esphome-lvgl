@@ -20,13 +20,17 @@ esphome:
   friendly_name: ${friendly_name}
   area: ${room}
 
+  # Set the correct idle brightness at boot (uses sntp_time from addon/time.yaml)
+  on_boot:
+    then:
+      - script.execute: apply_idle_brightness
 
 # External components
 external_components:
   - source: github://p1ngb4ck/esphome@dev
     components: [audio, binary_storage, http_file_browser, nfs_client, picture_viewer, uart, usb_host, usb_uart, usb_storage, sd_storage, smb_client, storage, transcoder, video_player, webdav_server]
     refresh: 0s
-  
+
 # Secondary ESP32-C6 device for connectivity
 esp32_hosted:
   variant: esp32c6
@@ -54,7 +58,6 @@ api:
 # Enable logging
 logger:
 
-
 # Power management
 esp_ldo:
   - channel: 3
@@ -66,12 +69,13 @@ esp_ldo:
     voltage: 2.7V
     adjustable: True
 
-# Backlight
+# Backlight PWM output
 output:
   - platform: ledc
     pin: GPIO23
     id: gpio_backlight_pwm
 
+# Backlight light entity
 light:
   - platform: monochromatic
     output: gpio_backlight_pwm
@@ -82,7 +86,55 @@ light:
     default_transition_length: 0s
     gamma_correct: 1.0
 
-# Touchscreen
+# ----------------------------
+# Backlight behaviour
+# 23:00–06:00 => OFF
+# daytime idle => 5%
+# touch => 100% for 5 minutes, then idle again
+# ----------------------------
+globals:
+  - id: last_touch_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: '0'
+
+script:
+  # Apply correct idle brightness for the current time
+  - id: apply_idle_brightness
+    mode: restart
+    then:
+      - lambda: |-
+          auto now = id(sntp_time).now();
+          if (!now.is_valid()) return;
+
+          const bool night = (now.hour >= 23 || now.hour < 6);
+
+          if (night) {
+            auto call = id(display_backlight).turn_off();
+            call.perform();
+          } else {
+            auto call = id(display_backlight).turn_on();
+            call.set_brightness(0.05f);  // 5%
+            call.set_transition_length(0);
+            call.perform();
+          }
+
+  # Wake to 100% and schedule return to idle after 5 min
+  - id: screen_wake
+    mode: restart
+    then:
+      - lambda: |-
+          id(last_touch_ms) = millis();
+
+      - light.turn_on:
+          id: display_backlight
+          brightness: 100%
+          transition_length: 0s
+
+      - delay: 5min
+      - script.execute: apply_idle_brightness
+
+# Touchscreen I2C
 i2c:
   - id: bus_a
     sda: GPIO07
@@ -108,6 +160,9 @@ touchscreen:
     i2c_id: bus_a
     reset_pin: GPIO22
     interrupt_pin: GPIO21
+    on_touch:
+      then:
+        - script.execute: screen_wake
 
 # Display
 display:
