@@ -75,39 +75,65 @@ script:
       - lambda: |-
           id(last_touch_ms) = millis();
 
-interval:
-  - interval: 5s
+globals:
+  - id: last_touch_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: '0'script:
+
+  - id: screen_wake
+    mode: restart
     then:
       - lambda: |-
+          id(last_touch_ms) = millis();
+          id(screen_dimmed) = false;
 
+      - light.turn_on:
+          id: display_backlight
+          brightness: 100%
+          transition_length: 0s
+
+      - delay: 5min
+      - script.execute: screen_dim
+
+
+  - id: screen_dim
+    then:
+      - lambda: |-
           auto now = id(sntp_time).now();
           if (!now.is_valid()) return;
 
-          int hour = now.hour;
-
-          // NIGHT MODE (23:00 → 06:00)
-          if (hour >= 23 || hour < 6) {
+          // Night mode
+          if (now.hour >= 23 || now.hour < 6) {
             auto call = id(display_backlight).turn_off();
             call.perform();
             return;
           }
 
-          // DAY MODE
-          uint32_t idle = millis() - id(last_touch_ms);
+          id(screen_dimmed) = true;
 
-          const uint32_t ACTIVE_TIME = 5UL * 60UL * 1000UL;
+      - light.turn_on:
+          id: display_backlight
+          brightness: 5%
+          transition_length: 1s
 
-          if (idle < ACTIVE_TIME) {
-            // ACTIVE → 100%
-            auto call = id(display_backlight).turn_on();
-            call.set_brightness(1.0f);
-            call.perform();
-          } else {
-            // AMBIENT → 5%
-            auto call = id(display_backlight).turn_on();
-            call.set_brightness(0.05f);
-            call.perform();
-          }
+      - delay: 25min
+      - script.execute: screen_off
+
+
+  - id: screen_off
+    then:
+      - light.turn_off:
+          id: display_backlight
+          transition_length: 2s
+
+        
+
+  - id: screen_dimmed
+    type: bool
+    initial_value: 'false'
+
+
 # Power management
 esp_ldo:
   - channel: 3
