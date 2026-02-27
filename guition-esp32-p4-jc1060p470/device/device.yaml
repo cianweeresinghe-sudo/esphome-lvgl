@@ -19,10 +19,11 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   area: ${room}
+
   on_boot:
-  priority: -10
-  then:
-    - script.execute: screen_wake
+    priority: -10
+    then:
+      - script.execute: screen_wake
 
 # External components
 external_components:
