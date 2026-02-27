@@ -1,119 +1,177 @@
+lvgl:
+  displays: my_display
+  byte_order: little_endian
 
-sensor:
+##################################################
+# TOP BAR (required by package)
+##################################################
 
-  ##################################################
-  # HEADER TEMPERATURES
-  ##################################################
+  top_layer:
+    widgets:
 
-  # ---------- HEADER TEMPS ----------
-- platform: homeassistant
-id: header_indoor_temp
-entity_id: sensor.family_s_echo_temperature
-@@ -21,10 +18,7 @@ sensor:
-- script.execute: update_header_temp
+      - label:
+          id: temperatures
+          text: "--° / --°"
+          align: top_left
+          x: 8
+          y: 8
 
-
-  ##################################################
-  # TADO TARGET TEMPERATURES
-  ##################################################
-
-  # ---------- TADO TARGET TEMPS ----------
-- platform: homeassistant
-id: living_target_temp
-entity_id: climate.smart_radiator_thermostat_x
-@@ -48,10 +42,7 @@ sensor:
-args: [ 'x' ]
-
-
-  ##################################################
-  # ENERGY
-  ##################################################
-
-  # ---------- ENERGY ----------
-- platform: homeassistant
-id: solar_today
-entity_id: sensor.solar_daily_production_kwh
-@@ -89,14 +80,12 @@ sensor:
-
-text_sensor:
-
-  # WEATHER CONDITION
-- platform: homeassistant
-id: weather_condition
-entity_id: weather.forecast_home
-on_value:
-- script.execute: update_weather_ui
-
-  # RAIN STATUS
-- platform: homeassistant
-id: rain_status
-entity_id: sensor.rain_status_text
-@@ -106,13 +95,59 @@ text_sensor:
-text: !lambda return x;
+      - label:
+          id: display_time
+          text: "--:--"
+          align: top_mid
+          y: 8
 
 
 ##################################################
-# LIGHT STATE SYNC (RESTORED)
+# MAIN PAGE
 ##################################################
 
-binary_sensor:
+  pages:
+    - id: home_summary_page
+      layout:
+        type: flex
+        flex_flow: column_wrap
+        pad_row: 10
+        pad_column: 10
+      width: 100%
+      bg_color: Black
+      pad_top: 42
 
-  - platform: homeassistant
-    id: living_light_state
-    entity_id: light.living_room
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: living_light_btn
-          state:
-            checked: !lambda return x;
+      widgets:
 
-  - platform: homeassistant
-    id: hall_light_state
-    entity_id: light.hall
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: hall_light_btn
-          state:
-            checked: !lambda return x;
+        ##################################################
+        # THERMOSTATS (CONTROL)
+        ##################################################
 
-  - platform: homeassistant
-    id: downstairs_light_state
-    entity_id: light.downstairs
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: downstairs_light_btn
-          state:
-            checked: !lambda return x;
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Living" }
 
-  - platform: homeassistant
-    id: garden_light_state
-    entity_id: light.garden_lights
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: garden_light_btn
-          state:
-            checked: !lambda return x;
+              - label:
+                  id: living_target_label
+                  align: center
+                  text: "--.-°C"
+
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_left
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state - 0.5;
+
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda return id(living_target_temp).state + 0.5;
 
 
-##################################################
-# SCRIPTS
-##################################################
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "House" }
 
-script:
+              - label:
+                  id: house_target_label
+                  align: center
+                  text: "--.-°C"
 
-  # HEADER TEMP UPDATE
-- id: update_header_temp
-then:
-- lvgl.label.update:
-@@ -124,7 +159,6 @@ script:
-             (int)round(id(header_outdoor_temp).state));
-           return buf;
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_left
+                  widgets:
+                    - label: { text: "-" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda return id(house_target_temp).state - 0.5;
 
-  # WEATHER ICON + COLOUR
- - id: update_weather_ui
-then:
-- lambda: |-
+              - button:
+                  width: 60
+                  height: 50
+                  align: bottom_right
+                  widgets:
+                    - label: { text: "+" }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda return id(house_target_temp).state + 0.5;
+
+
+        ##################################################
+        # ENERGY
+        ##################################################
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Solar" }
+              - label:
+                  id: solar_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Car" }
+              - label:
+                  id: car_label
+                  align: bottom_left
+                  text: "--%"
+
+
+        ##################################################
+        # WEATHER + RAIN
+        ##################################################
+
+        - button:
+            styles: control
+            widgets:
+              - label:
+                  id: weather_icon
+                  text_font: $icon_font
+                  text: "\uF059"
+
+              - label:
+                  id: weather_label
+                  align: bottom_left
+                  text: "--"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_label
+                  align: bottom_left
+                  text: "--"
