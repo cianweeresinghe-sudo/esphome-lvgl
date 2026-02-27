@@ -12,6 +12,7 @@ lvgl:
   style_definitions:
     - id: control
       bg_color: $button_control_color
+      text_color: $button_text_color   # <— add this
 
   theme:
     button:
