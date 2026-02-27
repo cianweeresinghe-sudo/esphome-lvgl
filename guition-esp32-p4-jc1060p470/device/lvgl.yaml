@@ -1,7 +1,13 @@
 lvgl:
   displays: my_display
   byte_order: little_endian
-  
+    on_ready:
+    then:
+      - logger.log: "LVGL ready — refreshing header"
+      - script.execute: update_header_temp
+      - script.execute: time_update
+      - script.execute: update_weather_ui
+      
   top_layer:
     widgets:
     
