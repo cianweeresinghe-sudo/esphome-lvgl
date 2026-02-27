@@ -19,15 +19,6 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   area: ${room}
-    
-    on_boot:
-    priority: -100
-    then:
-      - delay: 12s
-      - logger.log: "Refreshing LVGL header"
-      - script.execute: update_header_temp
-      - script.execute: update_weather_ui
-      - script.execute: time_update
 
 # External components
 external_components:
