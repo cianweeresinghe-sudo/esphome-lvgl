@@ -25,6 +25,196 @@ lvgl:
           text_align: center
           text_color: 0xFFFFFF
 
+    - obj:
+        id: control_overlay
+        width: 100%
+        height: 100%
+        bg_color: 0x000000
+        bg_opa: 180
+        hidden: true
+        clickable: true
+    
+        layout:
+          type: flex
+          flex_flow: column
+          flex_align_main: center
+          flex_align_cross: center
+    
+        widgets:
+    
+          # =========================
+          # LIVING THERMOSTAT PANEL
+          # =========================
+          - obj:
+              id: living_panel
+              hidden: true
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+    
+              widgets:
+                - label:
+                    text: "Living"
+                    text_font: label_font
+    
+                - label:
+                    id: living_overlay_temp
+                    text_font: statistics_font
+                    text: "--.-°C"
+    
+                - obj:
+                    layout:
+                      type: flex
+                      flex_flow: row
+                      pad_column: 40
+                    widgets:
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "-" }
+                          on_click:
+                            - homeassistant.service:
+                                service: climate.set_temperature
+                                data:
+                                  entity_id: climate.smart_radiator_thermostat_x
+                                  temperature: !lambda |
+                                    return id(living_target_temp).state - 0.5;
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "+" }
+                          on_click:
+                            - homeassistant.service:
+                                service: climate.set_temperature
+                                data:
+                                  entity_id: climate.smart_radiator_thermostat_x
+                                  temperature: !lambda |
+                                    return id(living_target_temp).state + 0.5;
+    
+          # =========================
+          # HOUSE THERMOSTAT PANEL
+          # =========================
+          - obj:
+              id: house_panel
+              hidden: true
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+    
+              widgets:
+                - label:
+                    text: "House"
+                    text_font: label_font
+    
+                - label:
+                    id: house_overlay_temp
+                    text_font: statistics_font
+                    text: "--.-°C"
+    
+                - obj:
+                    layout:
+                      type: flex
+                      flex_flow: row
+                      pad_column: 40
+                    widgets:
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "-" }
+                          on_click:
+                            - homeassistant.service:
+                                service: climate.set_temperature
+                                data:
+                                  entity_id: climate.wireless_temperature_sensor_x
+                                  temperature: !lambda |
+                                    return id(house_target_temp).state - 0.5;
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "+" }
+                          on_click:
+                            - homeassistant.service:
+                                service: climate.set_temperature
+                                data:
+                                  entity_id: climate.wireless_temperature_sensor_x
+                                  temperature: !lambda |
+                                    return id(house_target_temp).state + 0.5;
+    
+          # =========================
+          # SONOS PANEL
+          # =========================
+          - obj:
+              id: sonos_panel
+              hidden: true
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+    
+              widgets:
+    
+                - label:
+                    text: "Kitchen Sonos"
+                    text_font: label_font
+    
+                - label:
+                    id: sonos_volume_label
+                    text_font: statistics_font
+                    text: "--%"
+    
+                - obj:
+                    layout:
+                      type: flex
+                      flex_flow: row
+                      pad_column: 40
+                    widgets:
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "-" }
+                          on_click:
+                            - homeassistant.service:
+                                service: media_player.volume_down
+                                data:
+                                  entity_id: media_player.kitchen
+    
+                      - button:
+                          width: 110
+                          height: 110
+                          widgets:
+                            - label: { text: "+" }
+                          on_click:
+                            - homeassistant.service:
+                                service: media_player.volume_up
+                                data:
+                                  entity_id: media_player.kitchen
+    
+          # CLOSE BUTTON
+          - button:
+              width: 200
+              height: 70
+              widgets:
+                - label: { text: "Close" }
+              on_click:
+                - lvgl.widget.update:
+                    id: control_overlay
+                    hidden: true
+
   pages:
     - id: main_page
       layout:
@@ -112,6 +302,19 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
+            on_click:
+              - lvgl.widget.update:
+                  id: control_overlay
+                  hidden: false
+              - lvgl.widget.update:
+                  id: living_panel
+                  hidden: true
+              - lvgl.widget.update:
+                  id: house_panel
+                  hidden: false
+              - lvgl.widget.update:
+                  id: sonos_panel
+                  hidden: false
             
         - button:
             styles: control
@@ -126,7 +329,19 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
-
+            on_click:
+              - lvgl.widget.update:
+                  id: control_overlay
+                  hidden: false
+              - lvgl.widget.update:
+                  id: living_panel
+                  hidden: false
+              - lvgl.widget.update:
+                  id: house_panel
+                  hidden: true
+              - lvgl.widget.update:
+                  id: sonos_panel
+                  hidden: false
          
 
         # ---------------- ENERGY ----------------
