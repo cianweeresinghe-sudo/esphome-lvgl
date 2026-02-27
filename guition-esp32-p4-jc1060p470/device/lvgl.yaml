@@ -3,108 +3,33 @@ lvgl:
   byte_order: little_endian
 
   top_layer:
-  widgets:
-    # Header temps (indoor / outdoor)
-    - label:
-        text: "-° / -°"
-        id: temperatures
-        text_font: clockbar_font
-        align: top_left
-        x: 8
-        y: 8
-        text_color: 0xFFFFFF
+    widgets:
+      # Header temps (indoor / outdoor)
+      - label:
+          text: "-° / -°"
+          id: temperatures
+          text_font: clockbar_font
+          align: top_left
+          x: 8
+          y: 8
+          text_color: 0xFFFFFF
 
-    # Header clock
-    - label:
-        text: "--:--"
-        id: display_time
-        text_font: clockbar_font
-        align: top_mid
-        x: 0
-        y: 8
-        text_align: center
-        text_color: 0xFFFFFF
+      # Header clock
+      - label:
+          text: "--:--"
+          id: display_time
+          text_font: clockbar_font
+          align: top_mid
+          x: 0
+          y: 8
+          text_align: center
+          text_color: 0xFFFFFF
 
-    # ===== TRUE OVERLAY (NOT IN GRID) =====
-    - obj:
-        id: control_overlay
-        hidden: true
-        clickable: true
-        width: 100%
-        height: 100%
-        bg_color: 0x000000
-        bg_opa: 70%
-        border_width: 0
-        pad_all: 0
-
-        layout:
-          type: flex
-          flex_align_main: center
-          flex_align_cross: center
-
-        widgets:
-          - obj:
-              id: overlay_card
-              width: 420
-              height: 300
-              bg_color: 0x202020
-              bg_opa: 100%
-              border_width: 0
-              radius: 12
-              pad_all: 20
-
-              layout:
-                type: flex
-                flex_flow: column
-                flex_align_main: center
-                flex_align_cross: center
-                pad_row: 18
-
-              widgets:
-                - label:
-                    id: overlay_title
-                    text: "Control"
-                    text_font: label_font
-
-                - label:
-                    id: overlay_value
-                    text: "--"
-                    text_font: statistics_font
-
-                - obj:
-                    layout:
-                      type: flex
-                      flex_flow: row
-                      pad_column: 30
-                    widgets:
-                      - button:
-                          id: overlay_minus
-                          width: 100
-                          height: 100
-                          widgets:
-                            - label: { text: "-" }
-
-                      - button:
-                          id: overlay_plus
-                          width: 100
-                          height: 100
-                          widgets:
-                            - label: { text: "+" }
-
-                - button:
-                    width: 160
-                    height: 60
-                    widgets:
-                      - label: { text: "Close" }
-                    on_click:
-                      - lvgl.widget.update:
-                          id: control_overlay
-                          hidden: true
   pages:
     - id: main_page
       layout:
         type: flex
-        flex_flow: column_wrap
+        flex_flow: row_wrap
         pad_row: 10
         pad_column: 10
       width: 100%
@@ -121,7 +46,7 @@ lvgl:
             id: living_light_btn
             checkable: true
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $lightbulb, align: top_left }
@@ -135,7 +60,7 @@ lvgl:
             id: hall_light_btn
             checkable: true
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $lightbulb, align: top_left }
@@ -149,7 +74,7 @@ lvgl:
             id: downstairs_light_btn
             checkable: true
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $lightbulb, align: top_left }
@@ -163,7 +88,7 @@ lvgl:
             id: garden_light_btn
             checkable: true
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $lightbulb, align: top_left }
@@ -174,35 +99,65 @@ lvgl:
                   data: { entity_id: light.garden_lights }
 
         # ---------------- THERMOSTATS ----------------
-        - button:
+        # Living (tile + +/- controls)
+        - obj:
             styles: control
-            width: 210
+            width: 240
             height: 120
-            on_click:
-              - lvgl.widget.update:
-                  id: control_overlay
-                  hidden: false
-              - lvgl.label.update:
-                  id: overlay_title
-                  text: "Living Thermostat"
+            pad_all: 0
+            border_width: 0
             widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left }
-              - label: { text: "Living", align: bottom_left }
+              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
+              - label: { text: "Living", align: bottom_left, x: 10, y: -8 }
 
               - label:
                   id: living_target_label
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
-                  
-            
-        - button:
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: top_right
+                  x: -8
+                  y: 8
+                  widgets:
+                    - label: { text: "+", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda |-
+                            return id(living_target_temp).state + 0.5;
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  widgets:
+                    - label: { text: "-", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.smart_radiator_thermostat_x
+                          temperature: !lambda |-
+                            return id(living_target_temp).state - 0.5;
+
+        # House (tile + +/- controls)
+        - obj:
             styles: control
-            width: 210
+            width: 240
             height: 120
+            pad_all: 0
+            border_width: 0
             widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left }
-              - label: { text: "House", align: bottom_left }
+              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
+              - label: { text: "House", align: bottom_left, x: 10, y: -8 }
 
               - label:
                   id: house_target_label
@@ -210,12 +165,42 @@ lvgl:
                   text_font: clockbar_font
                   align: center
 
-         
+              - button:
+                  width: 52
+                  height: 52
+                  align: top_right
+                  x: -8
+                  y: 8
+                  widgets:
+                    - label: { text: "+", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda |-
+                            return id(house_target_temp).state + 0.5;
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  widgets:
+                    - label: { text: "-", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: climate.set_temperature
+                        data:
+                          entity_id: climate.wireless_temperature_sensor_x
+                          temperature: !lambda |-
+                            return id(house_target_temp).state - 0.5;
 
         # ---------------- ENERGY ----------------
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $solar, align: top_left }
@@ -229,7 +214,7 @@ lvgl:
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $energy, align: top_left }
@@ -243,7 +228,7 @@ lvgl:
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $battery, align: top_left }
@@ -258,7 +243,7 @@ lvgl:
         # ---------------- WEATHER ----------------
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label:
@@ -276,7 +261,7 @@ lvgl:
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $weather_rain, align: top_left }
@@ -291,7 +276,7 @@ lvgl:
         # ---------------- SONOS / MEDIA ----------------
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $radio, align: top_left }
@@ -304,7 +289,7 @@ lvgl:
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $radio, align: top_left }
@@ -317,7 +302,7 @@ lvgl:
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $sonos, align: top_left }
@@ -327,11 +312,11 @@ lvgl:
                   text: "--"
                   align: center
                   long_mode: scroll_circular
-                  width: 190
+                  width: 220
 
         - button:
             styles: control
-            width: 210
+            width: 240
             height: 120
             widgets:
               - label: { text_font: icon_font, text: $playpause, align: top_left }
@@ -345,16 +330,47 @@ lvgl:
                   data:
                     entity_id: media_player.kitchen
 
-        - button:
+        # Volume tile + +/- controls
+        - obj:
             styles: control
-            width: 210
+            width: 240
             height: 120
+            pad_all: 0
+            border_width: 0
             widgets:
-              - label: { text_font: icon_font, text: $volume, align: top_left }
-              - label: { text: "Vol", align: bottom_left }
+              - label: { text_font: icon_font, text: $volume, align: top_left, x: 10, y: 8 }
+              - label: { text: "Vol", align: bottom_left, x: 10, y: -8 }
+
               - label:
                   id: volume_label
                   text: "--%"
                   align: center
                   text_font: clockbar_font
-            
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: top_right
+                  x: -8
+                  y: 8
+                  widgets:
+                    - label: { text: "+", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: media_player.volume_up
+                        data:
+                          entity_id: media_player.kitchen
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  widgets:
+                    - label: { text: "-", text_font: label_font }
+                  on_click:
+                    - homeassistant.service:
+                        service: media_player.volume_down
+                        data:
+                          entity_id: media_player.kitchen
