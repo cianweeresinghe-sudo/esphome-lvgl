@@ -58,57 +58,53 @@ api:
 logger:
 
 globals:
-  - id: last_touch_ms
-    type: uint32_t
-    restore_value: no
-    initial_value: '0'
-
-  - id: screen_dimmed
+  - id: screen_awake
     type: bool
     restore_value: no
     initial_value: "false"
-
-
 script:
+
+  # ---------- WAKE SCREEN ----------
   - id: screen_wake
     mode: restart
     then:
-      - lambda: |-
-          id(last_touch_ms) = millis();
-          id(screen_dimmed) = false;
 
+      # go bright immediately
       - light.turn_on:
           id: display_backlight
           brightness: 100%
+          transition_length: 200ms
 
+      - lambda: |-
+          id(screen_awake) = true;
+
+      # after 5 mins return to idle state
       - delay: 5min
-      - script.execute: screen_dim
+      - script.execute: screen_idle
 
 
-  - id: screen_dim
+  # ---------- RETURN TO IDLE ----------
+  - id: screen_idle
     then:
       - lambda: |-
           auto now = id(sntp_time).now();
           if (!now.is_valid()) return;
 
+          // night mode
           if (now.hour >= 23 || now.hour < 6) {
             id(display_backlight).turn_off().perform();
+            id(screen_awake) = false;
             return;
           }
 
-          id(screen_dimmed) = true;
-
+      # daytime idle brightness
       - light.turn_on:
           id: display_backlight
           brightness: 5%
+          transition_length: 800ms
 
-      - delay: 25min
-      - script.execute: screen_off
-
-
-  - id: screen_off
-    then:
-      - light.turn_off: display_backlight
+      - lambda: |-
+          id(screen_awake) = false;
   
 # Power management
 esp_ldo:
