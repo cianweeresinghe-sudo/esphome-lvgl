@@ -308,13 +308,13 @@ lvgl:
                   hidden: false
               - lvgl.widget.update:
                   id: living_panel
-                  hidden: true
+                  hidden: false
               - lvgl.widget.update:
                   id: house_panel
-                  hidden: false
+                  hidden: true
               - lvgl.widget.update:
                   id: sonos_panel
-                  hidden: false
+                  hidden: true
             
         - button:
             styles: control
@@ -335,13 +335,13 @@ lvgl:
                   hidden: false
               - lvgl.widget.update:
                   id: living_panel
-                  hidden: false
-              - lvgl.widget.update:
-                  id: house_panel
                   hidden: true
               - lvgl.widget.update:
-                  id: sonos_panel
+                  id: house_panel
                   hidden: false
+              - lvgl.widget.update:
+                  id: sonos_panel
+                  hidden: true
          
 
         # ---------------- ENERGY ----------------
