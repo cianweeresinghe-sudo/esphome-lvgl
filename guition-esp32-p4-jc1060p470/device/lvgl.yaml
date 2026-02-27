@@ -28,7 +28,7 @@ lvgl:
 ##################################################
 
   pages:
-    - id: main
+    - id: dashboard_page
       layout:
         type: flex
         flex_flow: row_wrap
