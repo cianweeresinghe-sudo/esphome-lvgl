@@ -315,6 +315,7 @@ lvgl:
               - lvgl.widget.update:
                   id: sonos_panel
                   hidden: true
+              - lvgl.widget.redraw: control_overlay
             
         - button:
             styles: control
@@ -342,6 +343,7 @@ lvgl:
               - lvgl.widget.update:
                   id: sonos_panel
                   hidden: true
+              - lvgl.widget.redraw: control_overlay
          
 
         # ---------------- ENERGY ----------------
