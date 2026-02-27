@@ -1,7 +1,5 @@
-# Home Assistant sensors & bindings for the LVGL UI (no custom scripts)
-
 sensor:
-  # --- Header: Indoor temperature (kitchen Echo) ---
+  # -------- Header temperatures --------
   - platform: homeassistant
     id: header_indoor_temp
     entity_id: sensor.family_s_echo_temperature
@@ -18,7 +16,6 @@ sensor:
                      (int) round(id(header_outdoor_temp).state));
             return std::string(buf);
 
-  # --- Header: Outdoor temperature from weather entity attribute ---
   - platform: homeassistant
     id: header_outdoor_temp
     entity_id: weather.forecast_home
@@ -36,7 +33,7 @@ sensor:
                      (int) round(id(header_outdoor_temp).state));
             return std::string(buf);
 
-  # --- Thermostat targets (Tado) ---
+  # -------- Thermostat setpoints --------
   - platform: homeassistant
     id: living_target_temp
     entity_id: climate.smart_radiator_thermostat_x
@@ -59,7 +56,7 @@ sensor:
             format: "%.1f°C"
             args: ["x"]
 
-  # --- Energy / car ---
+  # -------- Energy / car --------
   - platform: homeassistant
     id: solar_today
     entity_id: sensor.solar_daily_production_kwh
@@ -90,9 +87,23 @@ sensor:
             format: "%.0f%%"
             args: ["x"]
 
+  # -------- Sonos volume (0.0..1.0) --------
+  - platform: homeassistant
+    id: kitchen_volume
+    entity_id: media_player.kitchen
+    attribute: volume_level
+    on_value:
+      - lvgl.label.update:
+          id: volume_label
+          text: !lambda |-
+            int pct = (int) round(x * 100.0f);
+            char buf[8];
+            snprintf(buf, sizeof(buf), "%d%%", pct);
+            return std::string(buf);
+
 
 text_sensor:
-  # --- Weather condition (state of weather entity) ---
+  # -------- Weather condition (entity state) --------
   - platform: homeassistant
     id: weather_condition
     entity_id: weather.forecast_home
@@ -102,7 +113,17 @@ text_sensor:
           text: !lambda |-
             return x;
 
-  # --- Rain status text ---
+      # Update icon glyph dynamically (unicode strings at runtime)
+      - lvgl.label.update:
+          id: weather_icon
+          text: !lambda |-
+            // F0590 sunny, F0595 cloudy, F0597 rainy
+            if (x == "sunny") return std::string("\U000F0590");
+            if (x == "cloudy" || x == "partlycloudy") return std::string("\U000F0595");
+            if (x == "rainy" || x == "pouring" || x == "lightning-rainy") return std::string("\U000F0597");
+            return std::string("\U000F0595");
+
+  # -------- Rain status text --------
   - platform: homeassistant
     id: rain_status
     entity_id: sensor.rain_status_text
@@ -110,19 +131,70 @@ text_sensor:
       - lvgl.label.update:
           id: rain_label
           text: !lambda |-
-            // Your sensor is coming through with extra whitespace / '>' line breaks.
             std::string s = x;
-            // Remove '>' characters
+            // Your sensor sometimes contains ">" and whitespace
             s.erase(std::remove(s.begin(), s.end(), '>'), s.end());
-            // Trim leading whitespace/newlines
             while (!s.empty() && (s.front() == ' ' || s.front() == '\n' || s.front() == '\r' || s.front() == '\t')) s.erase(s.begin());
-            // Trim trailing whitespace/newlines
-            while (!s.empty() && (s.back() == ' ' || s.back() == '\n' || s.back() == '\r' || s.back() == '\t')) s.pop_back();
+            while (!s.empty() && (s.back()  == ' ' || s.back()  == '\n' || s.back()  == '\r' || s.back()  == '\t')) s.pop_back();
+            if (s.empty()) s = "--";
+            return s;
+
+  # -------- Media player state --------
+  - platform: homeassistant
+    id: kitchen_player_state
+    entity_id: media_player.kitchen
+    on_value:
+      - lvgl.label.update:
+          id: play_state_label
+          text: !lambda |-
+            if (x == "playing") return std::string("Playing");
+            if (x == "paused")  return std::string("Paused");
+            if (x == "idle")    return std::string("Idle");
+            if (x == "off")     return std::string("Off");
+            return std::string("Play/Pause");
+
+  # -------- Now playing (title + artist) --------
+  - platform: homeassistant
+    id: kitchen_media_artist
+    entity_id: media_player.kitchen
+    attribute: media_artist
+    on_value:
+      - lvgl.label.update:
+          id: now_playing_label
+          text: !lambda |-
+            std::string t = id(kitchen_media_title).has_state() ? id(kitchen_media_title).state : "";
+            std::string a = x;
+            std::string s = t;
+            if (!a.empty()) {
+              if (!s.empty()) s += " · ";
+              s += a;
+            }
+            if (s.empty()) s = "--";
+            if (s.size() > 28) s = s.substr(0, 28) + "…";
+            return s;
+
+  - platform: homeassistant
+    id: kitchen_media_title
+    entity_id: media_player.kitchen
+    attribute: media_title
+    on_value:
+      - lvgl.label.update:
+          id: now_playing_label
+          text: !lambda |-
+            std::string t = x;
+            std::string a = id(kitchen_media_artist).has_state() ? id(kitchen_media_artist).state : "";
+            std::string s = t;
+            if (!a.empty()) {
+              if (!s.empty()) s += " · ";
+              s += a;
+            }
+            if (s.empty()) s = "--";
+            if (s.size() > 28) s = s.substr(0, 28) + "…";
             return s;
 
 
 binary_sensor:
-  # --- Light button checked states (match your working approach) ---
+  # -------- Light button check states --------
   - platform: homeassistant
     id: living_light_state
     entity_id: light.living_room
@@ -166,49 +238,3 @@ binary_sensor:
             id: garden_light_btn
             state:
               checked: !lambda return x;
-
-  - platform: homeassistant
-    id: kitchen_volume
-    entity_id: media_player.kitchen
-    attribute: volume_level
-    on_value:
-      - lvgl.label.update:
-          id: volume_label
-          text: !lambda |-
-            int pct = (int) round(x * 100.0f);
-            char buf[8];
-            snprintf(buf, sizeof(buf), "%d%%", pct);
-            return std::string(buf);
-  text_sensor:
-  - platform: homeassistant
-    id: kitchen_media_title
-    entity_id: media_player.kitchen
-    attribute: media_title
-    on_value:
-      - lvgl.label.update:
-          id: now_playing_label
-          text: !lambda |-
-            // Keep it short so it fits the tile
-            std::string s = x;
-            if (s.size() > 18) s = s.substr(0, 18) + "…";
-            return s;
-
-  - platform: homeassistant
-    id: kitchen_media_artist
-    entity_id: media_player.kitchen
-    attribute: media_artist
-    on_value:
-      - lvgl.label.update:
-          id: now_playing_label
-          text: !lambda |-
-            // Combine title + artist if available
-            std::string t = id(kitchen_media_title).has_state() ? id(kitchen_media_title).state : "";
-            std::string a = x;
-            std::string s = t;
-            if (!a.empty()) {
-              if (!s.empty()) s += " - ";
-              s += a;
-            }
-            if (s.empty()) s = "--";
-            if (s.size() > 18) s = s.substr(0, 18) + "…";
-            return s;
