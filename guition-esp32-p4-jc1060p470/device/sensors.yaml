@@ -1,177 +1,96 @@
-lvgl:
-  displays: my_display
-  byte_order: little_endian
-
 ##################################################
-# TOP BAR (required by package)
+# HEADER TEMPERATURES
 ##################################################
 
-  top_layer:
-    widgets:
+sensor:
 
-      - label:
-          id: temperatures
-          text: "--° / --°"
-          align: top_left
-          x: 8
-          y: 8
+  - platform: homeassistant
+    id: indoor_temp
+    entity_id: sensor.family_s_echo_temperature
+    on_value:
+      - script.execute: update_header
 
-      - label:
-          id: display_time
-          text: "--:--"
-          align: top_mid
-          y: 8
+  - platform: homeassistant
+    id: outdoor_temp
+    entity_id: weather.forecast_home
+    attribute: temperature
+    on_value:
+      - script.execute: update_header
 
 
 ##################################################
-# MAIN PAGE
+# ENERGY
 ##################################################
 
-  pages:
-    - id: home_summary_page
-      layout:
-        type: flex
-        flex_flow: column_wrap
-        pad_row: 10
-        pad_column: 10
-      width: 100%
-      bg_color: Black
-      pad_top: 42
+  - platform: homeassistant
+    id: solar_today
+    entity_id: sensor.solar_daily_production_kwh
+    on_value:
+      - lvgl.label.update:
+          id: solar_value
+          text:
+            format: "%.1f kWh"
+            args: ['x']
 
-      widgets:
+  - platform: homeassistant
+    id: usage_today
+    entity_id: sensor.envoy_122429013109_energy_consumption_today
+    on_value:
+      - lvgl.label.update:
+          id: usage_value
+          text:
+            format: "%.1f kWh"
+            args: ['x']
 
-        ##################################################
-        # THERMOSTATS (CONTROL)
-        ##################################################
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Living" }
-
-              - label:
-                  id: living_target_label
-                  align: center
-                  text: "--.-°C"
-
-              - button:
-                  width: 60
-                  height: 50
-                  align: bottom_left
-                  widgets:
-                    - label: { text: "-" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.smart_radiator_thermostat_x
-                          temperature: !lambda return id(living_target_temp).state - 0.5;
-
-              - button:
-                  width: 60
-                  height: 50
-                  align: bottom_right
-                  widgets:
-                    - label: { text: "+" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.smart_radiator_thermostat_x
-                          temperature: !lambda return id(living_target_temp).state + 0.5;
+  - platform: homeassistant
+    id: car_battery
+    entity_id: sensor.ky22mdv_battery
+    on_value:
+      - lvgl.label.update:
+          id: car_value
+          text:
+            format: "%.0f %%"
+            args: ['x']
 
 
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "House" }
+##################################################
+# TEXT SENSORS
+##################################################
 
-              - label:
-                  id: house_target_label
-                  align: center
-                  text: "--.-°C"
+text_sensor:
 
-              - button:
-                  width: 60
-                  height: 50
-                  align: bottom_left
-                  widgets:
-                    - label: { text: "-" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.wireless_temperature_sensor_x
-                          temperature: !lambda return id(house_target_temp).state - 0.5;
+  - platform: homeassistant
+    id: rain_status
+    entity_id: sensor.rain_status_text
+    on_value:
+      - lvgl.label.update:
+          id: rain_value
+          text: !lambda return x;
 
-              - button:
-                  width: 60
-                  height: 50
-                  align: bottom_right
-                  widgets:
-                    - label: { text: "+" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.wireless_temperature_sensor_x
-                          temperature: !lambda return id(house_target_temp).state + 0.5;
+  - platform: homeassistant
+    id: weather_status
+    entity_id: weather.forecast_home
+    on_value:
+      - lvgl.label.update:
+          id: weather_value
+          text: !lambda return x;
 
 
-        ##################################################
-        # ENERGY
-        ##################################################
+##################################################
+# HEADER SCRIPT
+##################################################
 
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Solar" }
-              - label:
-                  id: solar_label
-                  align: bottom_left
-                  text: "-- kWh"
+script:
+  - id: update_header
+    then:
+      - lambda: |-
+          if (!id(indoor_temp).has_state() ||
+              !id(outdoor_temp).has_state())
+            return;
 
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Usage" }
-              - label:
-                  id: usage_label
-                  align: bottom_left
-                  text: "-- kWh"
+          char buf[32];
+          snprintf(buf,sizeof(buf),"%d° / %d°",
+            (int)round(id(indoor_temp).state),
+            (int)round(id(outdoor_temp).state));
 
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Car" }
-              - label:
-                  id: car_label
-                  align: bottom_left
-                  text: "--%"
-
-
-        ##################################################
-        # WEATHER + RAIN
-        ##################################################
-
-        - button:
-            styles: control
-            widgets:
-              - label:
-                  id: weather_icon
-                  text_font: $icon_font
-                  text: "\uF059"
-
-              - label:
-                  id: weather_label
-                  align: bottom_left
-                  text: "--"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Rain" }
-              - label:
-                  id: rain_label
-                  align: bottom_left
-                  text: "--"
+          lv_label_set_text(id(temperatures), buf);
