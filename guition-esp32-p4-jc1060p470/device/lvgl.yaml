@@ -14,7 +14,7 @@ lvgl:
           y: 8
           text_color: 0xFFFFFF
 
-      # Clock header (updated by addon/time.yaml in the repo)
+      # Clock header (updated by addon/time.yaml)
       - label:
           text: "--:--"
           id: display_time
@@ -87,24 +87,34 @@ lvgl:
                   data: { entity_id: light.garden_lights }
 
         # ---------- THERMOSTATS ----------
-        # Living: tile with +/- controls
+        # Living: tile with compact +/- controls
         - button:
             styles: control
+            width: 220
+            height: 140
             widgets:
               - label:
                   text: "Living"
+                  align: top_left
 
               - label:
                   id: living_target_label
                   align: center
                   text: "--.-°C"
+                  text_font: clockbar_font
 
+              # Minus
               - button:
-                  width: 60
-                  height: 50
+                  width: 44
+                  height: 36
                   align: bottom_left
+                  x: 8
+                  y: -8
+                  radius: 6
                   widgets:
-                    - label: { text: "-" }
+                    - label:
+                        text: "-"
+                        align: center
                   on_click:
                     - if:
                         condition:
@@ -117,12 +127,18 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(living_target_temp).state - 0.5;
 
+              # Plus
               - button:
-                  width: 60
-                  height: 50
+                  width: 44
+                  height: 36
                   align: bottom_right
+                  x: -8
+                  y: -8
+                  radius: 6
                   widgets:
-                    - label: { text: "+" }
+                    - label:
+                        text: "+"
+                        align: center
                   on_click:
                     - if:
                         condition:
@@ -135,7 +151,7 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(living_target_temp).state + 0.5;
 
-        # House: readout only (keep simple/stable)
+        # House: readout only
         - button:
             styles: control
             widgets:
