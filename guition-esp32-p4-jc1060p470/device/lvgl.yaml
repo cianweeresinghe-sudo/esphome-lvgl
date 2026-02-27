@@ -4,7 +4,6 @@ lvgl:
 
   top_layer:
     widgets:
-      # Temperature header
       - label:
           text: "-° / -°"
           id: temperatures
@@ -14,7 +13,6 @@ lvgl:
           y: 8
           text_color: 0xFFFFFF
 
-      # Clock header (updated by addon/time.yaml)
       - label:
           text: "--:--"
           id: display_time
@@ -41,13 +39,21 @@ lvgl:
       pad_right: 5
 
       widgets:
-        # ---------- LIGHTS ----------
+        # ---------------- LIGHTS ----------------
         - button:
             id: living_light_btn
             checkable: true
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Living" }
+              - label:
+                  text_font: icon_font
+                  text: $lightbulb
+                  align: top_left
+              - label:
+                  text: "Living"
+                  align: bottom_left
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -57,8 +63,16 @@ lvgl:
             id: hall_light_btn
             checkable: true
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Hall" }
+              - label:
+                  text_font: icon_font
+                  text: $lightbulb
+                  align: top_left
+              - label:
+                  text: "Hall"
+                  align: bottom_left
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -68,8 +82,16 @@ lvgl:
             id: downstairs_light_btn
             checkable: true
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Downstairs" }
+              - label:
+                  text_font: icon_font
+                  text: $lightbulb
+                  align: top_left
+              - label:
+                  text: "Downstairs"
+                  align: bottom_left
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -79,22 +101,34 @@ lvgl:
             id: garden_light_btn
             checkable: true
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Garden" }
+              - label:
+                  text_font: icon_font
+                  text: $lightbulb
+                  align: top_left
+              - label:
+                  text: "Garden"
+                  align: bottom_left
             on_click:
               - homeassistant.service:
                   service: light.toggle
                   data: { entity_id: light.garden_lights }
 
-        # ---------- THERMOSTATS (fixed-size, grid-friendly) ----------
+        # ---------------- THERMOSTATS ----------------
         - button:
             styles: control
             width: 210
             height: 120
             widgets:
               - label:
-                  text: "Living"
+                  text_font: icon_font
+                  text: $aircon
                   align: top_left
+              - label:
+                  text: "Living"
+                  align: bottom_left
 
               - label:
                   id: living_target_label
@@ -150,8 +184,12 @@ lvgl:
             height: 120
             widgets:
               - label:
-                  text: "House"
+                  text_font: icon_font
+                  text: $aircon
                   align: top_left
+              - label:
+                  text: "House"
+                  align: bottom_left
 
               - label:
                   id: house_target_label
@@ -201,55 +239,104 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(house_target_temp).state + 0.5;
 
-        # ---------- ENERGY ----------
+        # ---------------- ENERGY ----------------
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Solar" }
+              - label:
+                  text_font: icon_font
+                  text: $lan
+                  align: top_left
+              - label:
+                  text: "Solar"
+                  align: bottom_left
               - label:
                   id: solar_label
-                  align: bottom_left
+                  align: bottom_right
+                  x: -8
+                  y: -8
                   text: "-- kWh"
 
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Usage" }
+              - label:
+                  text_font: icon_font
+                  text: $lan
+                  align: top_left
+              - label:
+                  text: "Usage"
+                  align: bottom_left
               - label:
                   id: usage_label
-                  align: bottom_left
+                  align: bottom_right
+                  x: -8
+                  y: -8
                   text: "-- kWh"
 
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Car" }
+              - label:
+                  text_font: icon_font
+                  text: $battery
+                  align: top_left
+              - label:
+                  text: "Car"
+                  align: bottom_left
               - label:
                   id: car_label
-                  align: bottom_left
+                  align: bottom_right
+                  x: -8
+                  y: -8
                   text: "--%"
 
-        # ---------- WEATHER ----------
+        # ---------------- WEATHER ----------------
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Weather" }
+              - label:
+                  text_font: icon_font
+                  text: $application
+                  align: top_left
+              - label:
+                  text: "Weather"
+                  align: bottom_left
               - label:
                   id: weather_label
-                  align: bottom_left
+                  align: bottom_right
+                  x: -8
+                  y: -8
                   text: "--"
 
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "Rain" }
+              - label:
+                  text_font: icon_font
+                  text: $nightlight
+                  align: top_left
+              - label:
+                  text: "Rain"
+                  align: bottom_left
               - label:
                   id: rain_label
-                  align: bottom_left
+                  align: bottom_right
+                  x: -8
+                  y: -8
                   text: "--"
-              # ---------- SONOS / MEDIA ----------
 
-        # Radio 1
+        # ---------------- SONOS / MEDIA ----------------
         - button:
             styles: control
             width: 210
@@ -268,7 +355,6 @@ lvgl:
                   data:
                     entity_id: script.sonos_favourite_radio_1
 
-        # Radio 2
         - button:
             styles: control
             width: 210
@@ -287,7 +373,6 @@ lvgl:
                   data:
                     entity_id: script.sonos_favourite_radio_2
 
-        # Now Playing (read-only tile)
         - button:
             styles: control
             width: 210
@@ -305,8 +390,9 @@ lvgl:
                   id: now_playing_label
                   text: "--"
                   align: bottom_left
+                  long_mode: scroll_circular
+                  width: 190
 
-        # Play / Pause
         - button:
             styles: control
             width: 210
@@ -326,7 +412,6 @@ lvgl:
                   data:
                     entity_id: media_player.kitchen
 
-        # Volume (tile with - / +)
         - button:
             styles: control
             width: 210
@@ -337,12 +422,15 @@ lvgl:
                   text: $volume
                   align: top_left
               - label:
+                  text: "Vol"
+                  align: bottom_left
+
+              - label:
                   id: volume_label
                   text: "--%"
                   align: center
                   text_font: clockbar_font
 
-              # Vol -
               - button:
                   width: 42
                   height: 34
@@ -366,7 +454,6 @@ lvgl:
                                   if (v < 0.0f) v = 0.0f;
                                   return v;
 
-              # Vol +
               - button:
                   width: 42
                   height: 34
