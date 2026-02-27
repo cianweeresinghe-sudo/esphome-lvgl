@@ -141,10 +141,7 @@ binary_sensor:
 ##################################################
 # SCRIPTS
 ##################################################
-time:
-  - platform: sntp
-    id: sntp_time
-    
+
 script:
   - id: update_header_temp
     then:
