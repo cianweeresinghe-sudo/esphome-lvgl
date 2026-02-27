@@ -103,6 +103,13 @@ lvgl:
             styles: control
             width: 210
             height: 120
+            on_click:
+              - lvgl.widget.update:
+                  id: control_overlay
+                  hidden: false
+              - lvgl.label.update:
+                  id: overlay_title
+                  text: "Living Thermostat"
             widgets:
               - label: { text_font: icon_font, text: $climate, align: top_left }
               - label: { text: "Living", align: bottom_left }
@@ -112,6 +119,7 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
+                  
             
         - button:
             styles: control
