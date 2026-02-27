@@ -62,23 +62,13 @@ globals:
     type: uint32_t
     restore_value: no
     initial_value: '0'
-    
-script:
-  - id: screen_wake
-    mode: restart
-    then:
-      - light.turn_on:
-          id: display_backlight
-          brightness: 100%
-          transition_length: 0s
-      - lambda: |-
-          id(last_touch_ms) = millis();
 
-globals:
-  - id: last_touch_ms
-    type: uint32_t
-    restore_value: no
-    initial_value: '0'script:
+  - id: screen_dimmed
+    type: bool
+    initial_value: 'false'
+
+
+script:
 
   - id: screen_wake
     mode: restart
@@ -102,7 +92,6 @@ globals:
           auto now = id(sntp_time).now();
           if (!now.is_valid()) return;
 
-          // Night mode
           if (now.hour >= 23 || now.hour < 6) {
             auto call = id(display_backlight).turn_off();
             call.perform();
@@ -125,14 +114,7 @@ globals:
       - light.turn_off:
           id: display_backlight
           transition_length: 2s
-
-        
-
-  - id: screen_dimmed
-    type: bool
-    initial_value: 'false'
-
-
+          
 # Power management
 esp_ldo:
   - channel: 3
