@@ -69,7 +69,6 @@ globals:
 
 
 script:
-
   - id: screen_wake
     mode: restart
     then:
@@ -114,7 +113,7 @@ script:
       - light.turn_off:
           id: display_backlight
           transition_length: 2s
-          
+
 # Power management
 esp_ldo:
   - channel: 3
