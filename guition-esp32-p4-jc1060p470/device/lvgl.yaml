@@ -8,7 +8,6 @@ lvgl:
 
   top_layer:
     widgets:
-
       - label:
           id: temperatures
           text: "--° / --°"
@@ -31,9 +30,9 @@ lvgl:
     - id: home_summary_page
       layout:
         type: flex
-        flex_flow: column_wrap
-        pad_row: 10
-        pad_column: 10
+        flex_flow: row_wrap
+        pad_row: 12
+        pad_column: 12
       width: 100%
       bg_color: black
       pad_top: 42
@@ -41,15 +40,24 @@ lvgl:
       widgets:
 
 ##################################################
-# LIVING LIGHT BRIGHTNESS
+# LIVING LIGHT
 ##################################################
 
-        - button:
-            styles: control
+        - obj:
+            width: 150
+            height: 120
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
             widgets:
-              - label: { text: "Living Light" }
+
+              - label:
+                  text: "Living Light"
+                  align: top_mid
 
               - button:
+                  width: 50
+                  height: 50
                   align: bottom_left
                   widgets:
                     - label: { text: "-" }
@@ -61,6 +69,8 @@ lvgl:
                           brightness: !lambda return max(1,(int)id(living_brightness).state - 25);
 
               - button:
+                  width: 50
+                  height: 50
                   align: bottom_right
                   widgets:
                     - label: { text: "+" }
@@ -71,15 +81,20 @@ lvgl:
                           entity_id: light.living_room
                           brightness: !lambda return min(255,(int)id(living_brightness).state + 25);
 
-
 ##################################################
-# THERMOSTAT CONTROL
+# THERMOSTAT
 ##################################################
 
-        - button:
-            styles: control
+        - obj:
+            width: 150
+            height: 120
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
             widgets:
-              - label: { text: "Living Heat" }
+
+              - label:
+                  text: "Heating"
 
               - button:
                   align: bottom_left
@@ -103,15 +118,20 @@ lvgl:
                           entity_id: climate.smart_radiator_thermostat_x
                           temperature: !lambda return id(living_target_temp).state + 0.5;
 
-
 ##################################################
-# SONOS VOLUME
+# SONOS
 ##################################################
 
-        - button:
-            styles: control
+        - obj:
+            width: 150
+            height: 120
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
             widgets:
-              - label: { text: "Kitchen Audio" }
+
+              - label:
+                  text: "Kitchen Audio"
 
               - button:
                   align: bottom_left
@@ -122,7 +142,7 @@ lvgl:
                         service: media_player.volume_set
                         data:
                           entity_id: media_player.kitchen
-                          volume_level: !lambda return max(0.0f, id(kitchen_volume).state - 0.05f);
+                          volume_level: !lambda return max(0.0f,id(kitchen_volume).state - 0.05f);
 
               - button:
                   align: bottom_right
@@ -133,4 +153,73 @@ lvgl:
                         service: media_player.volume_set
                         data:
                           entity_id: media_player.kitchen
-                          volume_level: !lambda return min(1.0f, id(kitchen_volume).state + 0.05f);
+                          volume_level: !lambda return min(1.0f,id(kitchen_volume).state + 0.05f);
+
+##################################################
+# STATUS TILES
+##################################################
+
+        - obj:
+            width: 150
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
+            widgets:
+              - label: { text: "Solar" }
+              - label:
+                  id: solar_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - obj:
+            width: 150
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_label
+                  align: bottom_left
+                  text: "-- kWh"
+
+        - obj:
+            width: 150
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
+            widgets:
+              - label: { text: "Car" }
+              - label:
+                  id: car_label
+                  align: bottom_left
+                  text: "-- %"
+
+        - obj:
+            width: 150
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
+            widgets:
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_label
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 150
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 12
+            pad_all: 10
+            widgets:
+              - label: { text: "Weather" }
+              - label:
+                  id: weather_label
+                  align: bottom_left
+                  text: "--"
