@@ -4,6 +4,7 @@ lvgl:
 
   top_layer:
     widgets:
+      # Header temps (indoor / outdoor)
       - label:
           text: "-° / -°"
           id: temperatures
@@ -13,6 +14,7 @@ lvgl:
           y: 8
           text_color: 0xFFFFFF
 
+      # Header clock
       - label:
           text: "--:--"
           id: display_time
@@ -47,13 +49,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lightbulb
-                  align: top_left
-              - label:
-                  text: "Living"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
+              - label: { text: "Living", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -66,13 +63,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lightbulb
-                  align: top_left
-              - label:
-                  text: "Hall"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
+              - label: { text: "Hall", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -85,13 +77,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lightbulb
-                  align: top_left
-              - label:
-                  text: "Downstairs"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
+              - label: { text: "Downstairs", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -104,13 +91,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lightbulb
-                  align: top_left
-              - label:
-                  text: "Garden"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
+              - label: { text: "Garden", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -122,19 +104,14 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $aircon
-                  align: top_left
-              - label:
-                  text: "Living"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $climate, align: top_left }
+              - label: { text: "Living", align: bottom_left }
 
               - label:
                   id: living_target_label
-                  align: center
                   text: "--.-°C"
                   text_font: clockbar_font
+                  align: center
 
               - button:
                   width: 42
@@ -183,19 +160,14 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $aircon
-                  align: top_left
-              - label:
-                  text: "House"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $climate, align: top_left }
+              - label: { text: "House", align: bottom_left }
 
               - label:
                   id: house_target_label
-                  align: center
                   text: "--.-°C"
                   text_font: clockbar_font
+                  align: center
 
               - button:
                   width: 42
@@ -245,57 +217,42 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lan
-                  align: top_left
-              - label:
-                  text: "Solar"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $solar, align: top_left }
+              - label: { text: "Solar", align: bottom_left }
               - label:
                   id: solar_label
+                  text: "-- kWh"
                   align: bottom_right
                   x: -8
                   y: -8
-                  text: "-- kWh"
 
         - button:
             styles: control
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $lan
-                  align: top_left
-              - label:
-                  text: "Usage"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $energy, align: top_left }
+              - label: { text: "Usage", align: bottom_left }
               - label:
                   id: usage_label
+                  text: "-- kWh"
                   align: bottom_right
                   x: -8
                   y: -8
-                  text: "-- kWh"
 
         - button:
             styles: control
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $battery
-                  align: top_left
-              - label:
-                  text: "Car"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $battery, align: top_left }
+              - label: { text: "Car", align: bottom_left }
               - label:
                   id: car_label
+                  text: "--%"
                   align: bottom_right
                   x: -8
                   y: -8
-                  text: "--%"
 
         # ---------------- WEATHER ----------------
         - button:
@@ -304,37 +261,31 @@ lvgl:
             height: 120
             widgets:
               - label:
+                  id: weather_icon
                   text_font: icon_font
-                  text: $application
+                  text: $weather_cloudy
                   align: top_left
-              - label:
-                  text: "Weather"
-                  align: bottom_left
+              - label: { text: "Weather", align: bottom_left }
               - label:
                   id: weather_label
+                  text: "--"
                   align: bottom_right
                   x: -8
                   y: -8
-                  text: "--"
 
         - button:
             styles: control
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $nightlight
-                  align: top_left
-              - label:
-                  text: "Rain"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $weather_rain, align: top_left }
+              - label: { text: "Rain", align: bottom_left }
               - label:
                   id: rain_label
+                  text: "--"
                   align: bottom_right
                   x: -8
                   y: -8
-                  text: "--"
 
         # ---------------- SONOS / MEDIA ----------------
         - button:
@@ -342,13 +293,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $radio
-                  align: top_left
-              - label:
-                  text: "Radio 1"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $radio, align: top_left }
+              - label: { text: "Radio 1", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: script.turn_on
@@ -360,13 +306,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $radio
-                  align: top_left
-              - label:
-                  text: "Radio 2"
-                  align: bottom_left
+              - label: { text_font: icon_font, text: $radio, align: top_left }
+              - label: { text: "Radio 2", align: bottom_left }
             on_click:
               - homeassistant.service:
                   service: script.turn_on
@@ -378,18 +319,12 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $sonos
-                  align: top_left
-              - label:
-                  text: "Now"
-                  align: top_left
-                  x: 60
+              - label: { text_font: icon_font, text: $sonos, align: top_left }
+              - label: { text: "Now", align: bottom_left }
               - label:
                   id: now_playing_label
                   text: "--"
-                  align: bottom_left
+                  align: center
                   long_mode: scroll_circular
                   width: 190
 
@@ -398,10 +333,7 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $playpause
-                  align: top_left
+              - label: { text_font: icon_font, text: $playpause, align: top_left }
               - label:
                   id: play_state_label
                   text: "Play/Pause"
@@ -417,14 +349,8 @@ lvgl:
             width: 210
             height: 120
             widgets:
-              - label:
-                  text_font: icon_font
-                  text: $volume
-                  align: top_left
-              - label:
-                  text: "Vol"
-                  align: bottom_left
-
+              - label: { text_font: icon_font, text: $volume, align: top_left }
+              - label: { text: "Vol", align: bottom_left }
               - label:
                   id: volume_label
                   text: "--%"
