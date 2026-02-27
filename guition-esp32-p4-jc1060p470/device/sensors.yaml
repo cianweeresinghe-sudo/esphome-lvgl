@@ -8,12 +8,15 @@ sensor:
   - platform: homeassistant
     id: header_indoor_temp
     entity_id: sensor.family_s_echo_temperature
+    trigger_on_initial_state: true
     on_value:
       - script.execute: update_header_temp
 
   - platform: homeassistant
     id: header_outdoor_temp
     entity_id: weather.forecast_home
+    attribute: temperature
+    trigger_on_initial_state: true
     on_value:
       - script.execute: update_header_temp
 
@@ -79,10 +82,10 @@ sensor:
 ##################################################
 
 text_sensor:
-
   - platform: homeassistant
     id: weather_condition
     entity_id: weather.forecast_home
+    trigger_on_initial_state: true
     on_value:
       - script.execute: update_weather_ui
 
@@ -145,39 +148,23 @@ binary_sensor:
 ##################################################
 # SCRIPTS
 ##################################################
-
+time:
+  - platform: sntp
+    id: sntp_time
+    
 script:
-
   - id: update_header_temp
     then:
-      - lvgl.label.update:
-          id: temperatures
-          text: !lambda |-
-            char buf[32];
-            snprintf(buf,sizeof(buf),"%d° / %d°",
-              (int)round(id(header_indoor_temp).state),
-              (int)round(id(header_outdoor_temp).state));
-            return buf;
+      - lambda: |-
+          if (!id(header_indoor_temp).has_state() || !id(header_outdoor_temp).has_state()) return;
+          char buf[32];
+          snprintf(buf, sizeof(buf), "%d° / %d°",
+                   (int) round(id(header_indoor_temp).state),
+                   (int) round(id(header_outdoor_temp).state));
+          lv_label_set_text(id(temperatures), buf);
 
   - id: update_weather_ui
     then:
       - lambda: |-
-          std::string cond = id(weather_condition).state;
-
-          std::string icon = "\uF059";
-          lv_color_t color = lv_color_hex(0xAAAAAA);
-
-          if (cond == "sunny") {
-            icon = "\uF185";
-            color = lv_color_hex(0xFFD54A);
-          } else if (cond == "cloudy" || cond == "partlycloudy") {
-            icon = "\uF0C2";
-            color = lv_color_hex(0xCCCCCC);
-          } else if (cond == "rainy") {
-            icon = "\uF73D";
-            color = lv_color_hex(0x4FC3F7);
-          }
-
-          lv_label_set_text(id(weather_icon), icon.c_str());
-          lv_obj_set_style_text_color(id(weather_icon), color, 0);
-          lv_label_set_text(id(weather_label), cond.c_str());
+          if (!id(weather_condition).has_state()) return;
+          lv_label_set_text(id(weather_label), id(weather_condition).state.c_str());
