@@ -4,7 +4,7 @@
 font:
   - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
     id: icon_font
-    size: 48
+    size: 42
     bpp: 8
     glyphs: [
       "\U000F0335",  # mdi-lightbulb
@@ -17,6 +17,8 @@ font:
       "\U000F1011",  # mdi-blinds-open
       "\U000F1A4C",  # mdi-lightbulb-night
       "\U000F1087",  # mdi-router-network
+      "\U000F050F",  # mdi-thermometer
+      "\U000F101E",  # mdi-cast-audio
       "\U000F036B",  # mdi-message-video
       "\U000F0614",  # mdi-application-outline
       "\U000F089E",  # mdi-battery
@@ -29,6 +31,8 @@ substitutions:
   lightbulb:      "\U000F0335"
   printer:        "\U000F042B"
   aircon:         "\U000F0D43"
+  sonos:          "\U000F101E"
+  climate:        "\U000F050F"
   ledstrip:       "\U000F1051"
   led_strip_variant: "\U000F1051"
   package:        "\U000F03D7"
