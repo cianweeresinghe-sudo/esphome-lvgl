@@ -8,7 +8,6 @@ sensor:
   - platform: homeassistant
     id: header_indoor_temp
     entity_id: sensor.family_s_echo_temperature
-    trigger_on_initial_state: true
     on_value:
       - script.execute: update_header_temp
 
@@ -16,7 +15,6 @@ sensor:
     id: header_outdoor_temp
     entity_id: weather.forecast_home
     attribute: temperature
-    trigger_on_initial_state: true
     on_value:
       - script.execute: update_header_temp
 
