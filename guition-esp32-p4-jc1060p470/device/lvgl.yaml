@@ -2,219 +2,227 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+  #################################################
+  # TOP HEADER
+  #################################################
   top_layer:
     widgets:
-      # Header temps (indoor / outdoor)
+
       - label:
-          text: "-° / -°"
           id: temperatures
+          text: "-° / -°"
           text_font: clockbar_font
           align: top_left
           x: 8
           y: 8
           text_color: 0xFFFFFF
 
-      # Header clock
       - label:
-          text: "--:--"
           id: display_time
+          text: "--:--"
           text_font: clockbar_font
           align: top_mid
-          x: 0
           y: 8
           text_align: center
           text_color: 0xFFFFFF
 
+      #################################################
+      # CONTROL OVERLAY (MODAL)
+      #################################################
       - obj:
           id: control_overlay
           width: 100%
           height: 100%
-          bg_color: 0x000000
-          bg_opa: 180
           hidden: true
           clickable: true
-      
+          bg_color: 0x000000
+          bg_opa: 180
+
           layout:
             type: flex
             flex_flow: column
             flex_align_main: center
             flex_align_cross: center
-    
-        widgets:
-    
-          # =========================
-          # LIVING THERMOSTAT PANEL
-          # =========================
-          - obj:
-              id: living_panel
-              hidden: true
-              layout:
-                type: flex
-                flex_flow: column
-                flex_align_main: center
-                flex_align_cross: center
-    
-              widgets:
-                - label:
-                    text: "Living"
-                    text_font: label_font
-    
-                - label:
-                    id: living_overlay_temp
-                    text_font: statistics_font
-                    text: "--.-°C"
-    
-                - obj:
-                    layout:
-                      type: flex
-                      flex_flow: row
-                      pad_column: 40
-                    widgets:
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "-" }
-                          on_click:
-                            - homeassistant.service:
-                                service: climate.set_temperature
-                                data:
-                                  entity_id: climate.smart_radiator_thermostat_x
-                                  temperature: !lambda |
-                                    return id(living_target_temp).state - 0.5;
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "+" }
-                          on_click:
-                            - homeassistant.service:
-                                service: climate.set_temperature
-                                data:
-                                  entity_id: climate.smart_radiator_thermostat_x
-                                  temperature: !lambda |
-                                    return id(living_target_temp).state + 0.5;
-    
-          # =========================
-          # HOUSE THERMOSTAT PANEL
-          # =========================
-          - obj:
-              id: house_panel
-              hidden: true
-              layout:
-                type: flex
-                flex_flow: column
-                flex_align_main: center
-                flex_align_cross: center
-    
-              widgets:
-                - label:
-                    text: "House"
-                    text_font: label_font
-    
-                - label:
-                    id: house_overlay_temp
-                    text_font: statistics_font
-                    text: "--.-°C"
-    
-                - obj:
-                    layout:
-                      type: flex
-                      flex_flow: row
-                      pad_column: 40
-                    widgets:
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "-" }
-                          on_click:
-                            - homeassistant.service:
-                                service: climate.set_temperature
-                                data:
-                                  entity_id: climate.wireless_temperature_sensor_x
-                                  temperature: !lambda |
-                                    return id(house_target_temp).state - 0.5;
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "+" }
-                          on_click:
-                            - homeassistant.service:
-                                service: climate.set_temperature
-                                data:
-                                  entity_id: climate.wireless_temperature_sensor_x
-                                  temperature: !lambda |
-                                    return id(house_target_temp).state + 0.5;
-    
-          # =========================
-          # SONOS PANEL
-          # =========================
-          - obj:
-              id: sonos_panel
-              hidden: true
-              layout:
-                type: flex
-                flex_flow: column
-                flex_align_main: center
-                flex_align_cross: center
-    
-              widgets:
-    
-                - label:
-                    text: "Kitchen Sonos"
-                    text_font: label_font
-    
-                - label:
-                    id: sonos_volume_label
-                    text_font: statistics_font
-                    text: "--%"
-    
-                - obj:
-                    layout:
-                      type: flex
-                      flex_flow: row
-                      pad_column: 40
-                    widgets:
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "-" }
-                          on_click:
-                            - homeassistant.service:
-                                service: media_player.volume_down
-                                data:
-                                  entity_id: media_player.kitchen
-    
-                      - button:
-                          width: 110
-                          height: 110
-                          widgets:
-                            - label: { text: "+" }
-                          on_click:
-                            - homeassistant.service:
-                                service: media_player.volume_up
-                                data:
-                                  entity_id: media_player.kitchen
-    
-          # CLOSE BUTTON
-          - button:
-              width: 200
-              height: 70
-              widgets:
-                - label: { text: "Close" }
-              on_click:
-                - lvgl.widget.update:
-                    id: control_overlay
-                    hidden: true
 
+          widgets:
+
+            #################################################
+            # LIVING THERM PANEL
+            #################################################
+            - obj:
+                id: living_panel
+                hidden: true
+                layout:
+                  type: flex
+                  flex_flow: column
+                  flex_align_main: center
+                  flex_align_cross: center
+                widgets:
+
+                  - label:
+                      text: "Living"
+                      text_font: label_font
+
+                  - label:
+                      id: living_overlay_temp
+                      text: "--.-°C"
+                      text_font: statistics_font
+
+                  - obj:
+                      layout:
+                        type: flex
+                        flex_flow: row
+                        pad_column: 40
+                      widgets:
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "-" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: climate.set_temperature
+                                  data:
+                                    entity_id: climate.smart_radiator_thermostat_x
+                                    temperature: !lambda |-
+                                      return id(living_target_temp).state - 0.5;
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "+" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: climate.set_temperature
+                                  data:
+                                    entity_id: climate.smart_radiator_thermostat_x
+                                    temperature: !lambda |-
+                                      return id(living_target_temp).state + 0.5;
+
+            #################################################
+            # HOUSE THERM PANEL
+            #################################################
+            - obj:
+                id: house_panel
+                hidden: true
+                layout:
+                  type: flex
+                  flex_flow: column
+                  flex_align_main: center
+                  flex_align_cross: center
+                widgets:
+
+                  - label:
+                      text: "House"
+                      text_font: label_font
+
+                  - label:
+                      id: house_overlay_temp
+                      text: "--.-°C"
+                      text_font: statistics_font
+
+                  - obj:
+                      layout:
+                        type: flex
+                        flex_flow: row
+                        pad_column: 40
+                      widgets:
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "-" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: climate.set_temperature
+                                  data:
+                                    entity_id: climate.wireless_temperature_sensor_x
+                                    temperature: !lambda |-
+                                      return id(house_target_temp).state - 0.5;
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "+" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: climate.set_temperature
+                                  data:
+                                    entity_id: climate.wireless_temperature_sensor_x
+                                    temperature: !lambda |-
+                                      return id(house_target_temp).state + 0.5;
+
+            #################################################
+            # SONOS PANEL
+            #################################################
+            - obj:
+                id: sonos_panel
+                hidden: true
+                layout:
+                  type: flex
+                  flex_flow: column
+                  flex_align_main: center
+                  flex_align_cross: center
+                widgets:
+
+                  - label:
+                      text: "Kitchen Sonos"
+                      text_font: label_font
+
+                  - label:
+                      id: sonos_volume_label
+                      text: "--%"
+                      text_font: statistics_font
+
+                  - obj:
+                      layout:
+                        type: flex
+                        flex_flow: row
+                        pad_column: 40
+                      widgets:
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "-" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: media_player.volume_down
+                                  data:
+                                    entity_id: media_player.kitchen
+
+                        - button:
+                            width: 100
+                            height: 100
+                            widgets:
+                              - label: { text: "+" }
+                            on_click:
+                              - homeassistant.service:
+                                  service: media_player.volume_up
+                                  data:
+                                    entity_id: media_player.kitchen
+
+            #################################################
+            # CLOSE BUTTON
+            #################################################
+            - button:
+                width: 200
+                height: 70
+                widgets:
+                  - label: { text: "Close" }
+                on_click:
+                  - lvgl.widget.update:
+                      id: control_overlay
+                      hidden: true
+
+  #################################################
+  # MAIN PAGE
+  #################################################
   pages:
     - id: main_page
       layout:
@@ -222,274 +230,46 @@ lvgl:
         flex_flow: column_wrap
         pad_row: 10
         pad_column: 10
+
       width: 100%
-      bg_color: Black
-      bg_opa: cover
       pad_top: 42
-      pad_bottom: 5
-      pad_left: 5
-      pad_right: 5
 
       widgets:
-        # ---------------- LIGHTS ----------------
+
+        #################################################
+        # LIVING THERM TILE (OPENS OVERLAY)
+        #################################################
         - button:
-            id: living_light_btn
-            checkable: true
-            styles: control
             width: 210
             height: 120
+            styles: control
             widgets:
-              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
               - label: { text: "Living", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.living_room }
-
-        - button:
-            id: hall_light_btn
-            checkable: true
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
-              - label: { text: "Hall", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.hall }
-
-        - button:
-            id: downstairs_light_btn
-            checkable: true
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
-              - label: { text: "Downstairs", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.downstairs }
-
-        - button:
-            id: garden_light_btn
-            checkable: true
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $lightbulb, align: top_left }
-              - label: { text: "Garden", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.garden_lights }
-
-        # ---------------- THERMOSTATS ----------------
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left }
-              - label: { text: "Living", align: bottom_left }
-
               - label:
                   id: living_target_label
                   text: "--.-°C"
-                  text_font: clockbar_font
                   align: center
-                  
             on_click:
-              - lvgl.widget.update:
-                  id: control_overlay
-                  hidden: false
-              - lvgl.widget.update:
-                  id: living_panel
-                  hidden: false
-              - lvgl.widget.update:
-                  id: house_panel
-                  hidden: true
-              - lvgl.widget.update:
-                  id: sonos_panel
-                  hidden: true
-              - lvgl.widget.move_foreground: control_overlay   
-              
+              - lvgl.widget.update: { id: control_overlay, hidden: false }
+              - lvgl.widget.update: { id: living_panel, hidden: false }
+              - lvgl.widget.update: { id: house_panel, hidden: true }
+              - lvgl.widget.update: { id: sonos_panel, hidden: true }
+
+        #################################################
+        # HOUSE THERM TILE
+        #################################################
         - button:
-            styles: control
             width: 210
             height: 120
+            styles: control
             widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left }
               - label: { text: "House", align: bottom_left }
-
               - label:
                   id: house_target_label
                   text: "--.-°C"
-                  text_font: clockbar_font
                   align: center
             on_click:
-              - lvgl.widget.update:
-                  id: control_overlay
-                  hidden: false
-              - lvgl.widget.update:
-                  id: living_panel
-                  hidden: true
-              - lvgl.widget.update:
-                  id: house_panel
-                  hidden: false
-              - lvgl.widget.update:
-                  id: sonos_panel
-                  hidden: true
-              - lvgl.widget.move_foreground: control_overlay         
-
-        # ---------------- ENERGY ----------------
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $solar, align: top_left }
-              - label: { text: "Solar", align: bottom_left }
-              - label:
-                  id: solar_label
-                  text: "-- kWh"
-                  align: bottom_right
-                  x: -8
-                  y: -8
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $energy, align: top_left }
-              - label: { text: "Usage", align: bottom_left }
-              - label:
-                  id: usage_label
-                  text: "-- kWh"
-                  align: bottom_right
-                  x: -8
-                  y: -8
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $battery, align: top_left }
-              - label: { text: "Car", align: bottom_left }
-              - label:
-                  id: car_label
-                  text: "--%"
-                  align: bottom_right
-                  x: -8
-                  y: -8
-
-        # ---------------- WEATHER ----------------
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label:
-                  id: weather_icon
-                  text_font: icon_font
-                  text: $weather_cloudy
-                  align: top_left
-              - label: { text: "Weather", align: bottom_left }
-              - label:
-                  id: weather_label
-                  text: "--"
-                  align: bottom_right
-                  x: -8
-                  y: -8
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $weather_rain, align: top_left }
-              - label: { text: "Rain", align: bottom_left }
-              - label:
-                  id: rain_label
-                  text: "--"
-                  align: bottom_right
-                  x: -8
-                  y: -8
-
-        # ---------------- SONOS / MEDIA ----------------
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $radio, align: top_left }
-              - label: { text: "Radio 1", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: script.turn_on
-                  data:
-                    entity_id: script.sonos_favourite_radio_1
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $radio, align: top_left }
-              - label: { text: "Radio 2", align: bottom_left }
-            on_click:
-              - homeassistant.service:
-                  service: script.turn_on
-                  data:
-                    entity_id: script.sonos_favourite_radio_2
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $sonos, align: top_left }
-              - label: { text: "Now", align: bottom_left }
-              - label:
-                  id: now_playing_label
-                  text: "--"
-                  align: center
-                  long_mode: scroll_circular
-                  width: 190
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $playpause, align: top_left }
-              - label:
-                  id: play_state_label
-                  text: "Play/Pause"
-                  align: bottom_left
-            on_click:
-              - homeassistant.service:
-                  service: media_player.media_play_pause
-                  data:
-                    entity_id: media_player.kitchen
-
-        - button:
-            styles: control
-            width: 210
-            height: 120
-            widgets:
-              - label: { text_font: icon_font, text: $volume, align: top_left }
-              - label: { text: "Vol", align: bottom_left }
-              - label:
-                  id: volume_label
-                  text: "--%"
-                  align: center
-                  text_font: clockbar_font
-
-            
+              - lvgl.widget.update: { id: control_overlay, hidden: false }
+              - lvgl.widget.update: { id: living_panel, hidden: true }
+              - lvgl.widget.update: { id: house_panel, hidden: false }
+              - lvgl.widget.update: { id: sonos_panel, hidden: true }
