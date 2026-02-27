@@ -179,11 +179,6 @@ lvgl:
             styles: control
             widgets:
               - label:
-                  id: weather_icon
-                  text_font: icon_font   # ✅ correct font
-                  text: "\uF059"
-
-              - label:
                   id: weather_label
                   align: bottom_left
                   text: "--"
