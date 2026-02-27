@@ -24,6 +24,11 @@ font:
       "\U000F089E",  # mdi-battery
       "\U000F07DE",  # mdi-filament
       "\U000F0317",  # mdi-lan
+      "\U000F0439",  # mdi-radio
+      "\U000F040A",  # mdi-play
+      "\U000F03E4",  # mdi-pause
+      "\U000F040E",  # mdi-play-pause
+      "\U000F057E",  # mdi-volume-high
       ]
 
 # Map icons to names
@@ -33,6 +38,11 @@ substitutions:
   aircon:         "\U000F0D43"
   sonos:          "\U000F101E"
   climate:        "\U000F050F"
+  radio:      "\U000F0439"
+  play:       "\U000F040A"
+  pause:      "\U000F03E4"
+  playpause:  "\U000F040E"
+  volume:     "\U000F057E"
   ledstrip:       "\U000F1051"
   led_strip_variant: "\U000F1051"
   package:        "\U000F03D7"
