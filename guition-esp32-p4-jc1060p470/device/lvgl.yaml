@@ -3,28 +3,103 @@ lvgl:
   byte_order: little_endian
 
   top_layer:
-    widgets:
-      # Header temps (indoor / outdoor)
-      - label:
-          text: "-° / -°"
-          id: temperatures
-          text_font: clockbar_font
-          align: top_left
-          x: 8
-          y: 8
-          text_color: 0xFFFFFF
+  widgets:
+    # Header temps (indoor / outdoor)
+    - label:
+        text: "-° / -°"
+        id: temperatures
+        text_font: clockbar_font
+        align: top_left
+        x: 8
+        y: 8
+        text_color: 0xFFFFFF
 
-      # Header clock
-      - label:
-          text: "--:--"
-          id: display_time
-          text_font: clockbar_font
-          align: top_mid
-          x: 0
-          y: 8
-          text_align: center
-          text_color: 0xFFFFFF
+    # Header clock
+    - label:
+        text: "--:--"
+        id: display_time
+        text_font: clockbar_font
+        align: top_mid
+        x: 0
+        y: 8
+        text_align: center
+        text_color: 0xFFFFFF
 
+    # ===== TRUE OVERLAY (NOT IN GRID) =====
+    - obj:
+        id: control_overlay
+        hidden: true
+        clickable: true
+        width: 100%
+        height: 100%
+        bg_color: 0x000000
+        bg_opa: 70%
+        border_width: 0
+        pad_all: 0
+
+        layout:
+          type: flex
+          flex_align_main: center
+          flex_align_cross: center
+
+        widgets:
+          - obj:
+              id: overlay_card
+              width: 420
+              height: 300
+              bg_color: 0x202020
+              bg_opa: 100%
+              border_width: 0
+              radius: 12
+              pad_all: 20
+
+              layout:
+                type: flex
+                flex_flow: column
+                flex_align_main: center
+                flex_align_cross: center
+                pad_row: 18
+
+              widgets:
+                - label:
+                    id: overlay_title
+                    text: "Control"
+                    text_font: label_font
+
+                - label:
+                    id: overlay_value
+                    text: "--"
+                    text_font: statistics_font
+
+                - obj:
+                    layout:
+                      type: flex
+                      flex_flow: row
+                      pad_column: 30
+                    widgets:
+                      - button:
+                          id: overlay_minus
+                          width: 100
+                          height: 100
+                          widgets:
+                            - label: { text: "-" }
+
+                      - button:
+                          id: overlay_plus
+                          width: 100
+                          height: 100
+                          widgets:
+                            - label: { text: "+" }
+
+                - button:
+                    width: 160
+                    height: 60
+                    widgets:
+                      - label: { text: "Close" }
+                    on_click:
+                      - lvgl.widget.update:
+                          id: control_overlay
+                          hidden: true
   pages:
     - id: main_page
       layout:
@@ -282,78 +357,4 @@ lvgl:
                   text: "--%"
                   align: center
                   text_font: clockbar_font
-
-        # ================= OVERLAY =================
-        - obj:
-            id: control_overlay
-            hidden: true
-            clickable: true
-            width: 100%
-            height: 100%
-            bg_color: 0x000000
-            bg_opa: 70%
-
-            layout:
-              type: flex
-              flex_align_main: center
-              flex_align_cross: center
-
-            widgets:
-
-              - obj:
-                  id: overlay_card
-                  width: 420
-                  height: 300
-                  bg_color: 0x202020
-                  radius: 12
-                  layout:
-                    type: flex
-                    flex_flow: column
-                    flex_align_main: center
-                    flex_align_cross: center
-                    pad_row: 20
-
-                  widgets:
-
-                    - label:
-                        id: overlay_title
-                        text: "Control"
-                        text_font: label_font
-
-                    - label:
-                        id: overlay_value
-                        text: "--"
-                        text_font: statistics_font
-
-                    - obj:
-                        layout:
-                          type: flex
-                          flex_flow: row
-                          pad_column: 40
-
-                        widgets:
-
-                          - button:
-                              width: 120
-                              height: 120
-                              widgets:
-                                - label: { text: "-" }
-                              id: overlay_minus
-
-                          - button:
-                              width: 120
-                              height: 120
-                              widgets:
-                                - label: { text: "+" }
-                              id: overlay_plus
-
-                    - button:
-                        width: 160
-                        height: 60
-                        widgets:
-                          - label: { text: "Close" }
-                        on_click:
-                          - lvgl.widget.update:
-                              id: control_overlay
-                              hidden: true
             
