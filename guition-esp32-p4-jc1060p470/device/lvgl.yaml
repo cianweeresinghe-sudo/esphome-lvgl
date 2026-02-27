@@ -1,246 +1,150 @@
-sensor:
+lvgl:
+  displays: my_display
+  byte_order: little_endian
 
-  # Header Outdoor Temperate
-  - platform: homeassistant
-    entity_id: sensor.office_temperature
-    id: office_temperature
-    on_value:
-      - lvgl.label.update:
+  top_layer:
+    widgets:
+      - label:
           id: temperatures
-          text:
-            format: "%d° / %d°"
-            args: [ '(int)round(id(outdoor_temperature).state)', '(int)round(x)' ]
+          text: "--° / --°"
+          align: top_left
+          x: 8
+          y: 8
 
-  - platform: homeassistant
-    entity_id: sensor.outdoor_temperature
-    id: outdoor_temperature
-    on_value:
-      - lvgl.label.update:
-          id: temperatures
-          text:
-            format: "%d° / %d°"
-            args: [ '(int)round(x)', '(int)round(id(office_temperature).state)' ]
-
-  # Office Blind Position
-  - platform: homeassistant
-    entity_id: cover.office_blind
-    id: office_blind_position
-    attribute: current_position
-
-  # Centauri Carbon Print Progress
-  - platform: homeassistant
-    entity_id: sensor.centauri_carbon_percent_complete_helper
-    id: centauri_carbon_percent
-    on_value:
-      - lvgl.label.update:
-          id: print_progress_label
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
-
-  # Filament Heater Humidity
-  - platform: homeassistant
-    entity_id: sensor.office_filament_heater_sensor_humidity
-    id: filament_heater_humidity
-    on_value:
-      - lvgl.label.update:
-          id: dryer_humidity_label
-          text:
-            format: "%.0f"
-            args: [ 'x' ]
+      - label:
+          id: display_time
+          text: "--:--"
+          align: top_mid
+          y: 8
 
 
+  pages:
+    - id: home_summary_page
+      layout:
+        type: flex
+        flex_flow: column_wrap
+        pad_row: 10
+        pad_column: 10
+      width: 100%
+      bg_color: black
+      pad_top: 42
 
-binary_sensor:
+      widgets:
 
-  # Office Evening Scene
-  - platform: homeassistant
-    id: office_scene_evening
-    entity_id: switch.office_evening_stateful_scene
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_scene_evening_button
-          state:
-            checked: !lambda return x;
+        # ---------- LIGHTS ----------
+        - button:
+            id: living_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Living" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data: { entity_id: light.living_room }
 
-  # Office Dimmed Scene
-  - platform: homeassistant
-    id: office_scene_dimmed
-    entity_id: switch.office_dimmed_stateful_scene
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_scene_dimmed_button
-          state:
-            checked: !lambda return x;
+        - button:
+            id: hall_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Hall" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data: { entity_id: light.hall }
 
-  # Office Calls Scene
-  - platform: homeassistant
-    id: office_scene_desk_call
-    entity_id: switch.office_calls_stateful_scene
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_scene_calls_button
-          state:
-            checked: !lambda return x;
+        - button:
+            id: downstairs_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Downstairs" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data: { entity_id: light.downstairs }
 
-  # Office Features Scene
-  - platform: homeassistant
-    id: office_scene_features
-    entity_id: switch.office_features_stateful_scene
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_scene_features_button
-          state:
-            checked: !lambda return x;
+        - button:
+            id: garden_light_btn
+            checkable: true
+            styles: control
+            widgets:
+              - label: { text: "Garden" }
+            on_click:
+              - homeassistant.service:
+                  service: light.toggle
+                  data: { entity_id: light.garden_lights }
 
-  # 3d Printer
-  - platform: homeassistant
-    id: office_3d_printer_power
-    entity_id: switch.office_3d_printer_power
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        - lvgl.widget.update:
-            id: printer_power_button
-            state:
-              checked: !lambda return x;
-        - lvgl.widget.update:
-            id: printer_power_icon
-            hidden: !lambda return x;
-        - lvgl.widget.update:
-            id: print_progress_container
-            hidden: !lambda return !x;
 
-  # Office Aircon
-  - platform: homeassistant
-    id: office_air_conditioner
-    entity_id: switch.office_air_conditioner
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_aircon_button
-          state:
-            checked: !lambda return x;
+        # ---------- THERMOSTATS ----------
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Living" }
+              - label:
+                  id: living_target_label
+                  align: bottom_left
+                  text: "--.-°C"
 
-  # Battery Charger
-  - platform: homeassistant
-    id: office_battery_charger
-    entity_id: switch.battery_charger
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: battery_charger_button
-          state:
-            checked: !lambda return x;
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "House" }
+              - label:
+                  id: house_target_label
+                  align: bottom_left
+                  text: "--.-°C"
 
-  # Filament Heater 
-  - platform: homeassistant
-    id: office_filament_heater
-    entity_id: switch.office_filament_heater_893b
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        - lvgl.widget.update:
-            id: filament_heater_button
-            state:
-              checked: !lambda return x;
-        - lvgl.widget.update:
-            id: filament_heater_icon
-            hidden: !lambda return x;
-        - lvgl.widget.update:
-            id: dryer_humidity_container
-            hidden: !lambda return !x;
 
-  # Office Blind 100% (Open)
-  - platform: template
-    id: office_blind_100
-    lambda: |-
-      if (id(office_blind_position).has_state()) {
-        return abs(id(office_blind_position).state - 100) <= 3;
-      }
-      return false;
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_blind_open_button
-          state:
-            checked: !lambda return x;
+        # ---------- ENERGY ----------
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Solar" }
+              - label:
+                  id: solar_label
+                  align: bottom_left
+                  text: "-- kWh"
 
-  # Office Blind 66% (Semi Open)
-  - platform: template
-    id: office_blind_66
-    lambda: |-
-      if (id(office_blind_position).has_state()) {
-        return abs(id(office_blind_position).state - 66) <= 3;
-      }
-      return false;
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_blind_66_button
-          state:
-            checked: !lambda return x;
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_label
+                  align: bottom_left
+                  text: "-- kWh"
 
-  # Office Blind 33% (Semi Closed)
-  - platform: template
-    id: office_blind_33
-    lambda: |-
-      if (id(office_blind_position).has_state()) {
-        return abs(id(office_blind_position).state - 33) <= 3;
-      }
-      return false;
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_blind_33_button
-          state:
-            checked: !lambda return x;
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Car" }
+              - label:
+                  id: car_label
+                  align: bottom_left
+                  text: "--%"
 
-  # Office Blind 0% (Close)
-  - platform: template
-    id: office_blind_0
-    lambda: |-
-      if (id(office_blind_position).has_state()) {
-        return abs(id(office_blind_position).state - 0) <= 3;
-      }
-      return false;
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: office_blind_close_button
-          state:
-            checked: !lambda return x;
 
-  # Office Storage Lights
-  - platform: homeassistant
-    id: office_storage_lights
-    entity_id: light.office_storage
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: storage_lights_button
-          state:
-            checked: !lambda return x;
+        # ---------- WEATHER ----------
+        - button:
+            styles: control
+            widgets:
+              - label:
+                  id: weather_icon
+                  text_font: icon_font   # ✅ correct font
+                  text: "\uF059"
 
-  # Network Rack
-  - platform: homeassistant
-    id: network_rack
-    entity_id: light.office_network_rack
-    trigger_on_initial_state: true
-    on_state:
-      then:
-        lvgl.widget.update:
-          id: network_rack_button
-          state:
-            checked: !lambda return x;
+              - label:
+                  id: weather_label
+                  align: bottom_left
+                  text: "--"
+
+        - button:
+            styles: control
+            widgets:
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_label
+                  align: bottom_left
+                  text: "--"
