@@ -2,7 +2,7 @@
 switch:
   - platform: template
     id: backlight
-    restore_mode: ALWAYS_ON
+    restore_mode: DISABLED
     internal: true
     turn_on_action:
       - light.turn_on: display_backlight
