@@ -23,6 +23,11 @@ font:
       "\U000F0614",  # mdi-application-outline
       "\U000F089E",  # mdi-battery
       "\U000F07DE",  # mdi-filament
+      "\U000F0590",  # mdi-weather-sunny
+      "\U000F0595",  # mdi-weather-cloudy
+      "\U000F0597",  # mdi-weather-rainy
+      "\U000F1904",  # mdi-solar-power
+      "\U000F1A73",  # mdi-home-lightning-bolt (energy usage)
       "\U000F0317",  # mdi-lan
       "\U000F0439",  # mdi-radio
       "\U000F040A",  # mdi-play
@@ -45,6 +50,11 @@ substitutions:
   volume:     "\U000F057E"
   ledstrip:       "\U000F1051"
   led_strip_variant: "\U000F1051"
+  weather_sunny: "\U000F0590"
+  weather_cloudy: "\U000F0595"
+  weather_rain: "\U000F0597"
+  solar: "\U000F1904"
+  energy: "\U000F1A73"
   package:        "\U000F03D7"
   lights:         "\U000F07D6"
   blinds_closed:  "\U000F00AC"
