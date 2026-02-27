@@ -19,10 +19,10 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   area: ${room}
-
   on_boot:
-    then:
-      - script.execute: screen_wake
+  priority: -10
+  then:
+    - script.execute: screen_wake
 
 # External components
 external_components:
@@ -58,56 +58,55 @@ api:
 logger:
 
 globals:
-  - id: screen_awake
-    type: bool
+  - id: last_touch_ms
+    type: uint32_t
     restore_value: no
-    initial_value: "false"
-
-  
+    initial_value: '0'
+    
 script:
-
-  # ---------- WAKE SCREEN ----------
   - id: screen_wake
     mode: restart
     then:
-
-      # go bright immediately
       - light.turn_on:
           id: display_backlight
           brightness: 100%
-          transition_length: 200ms
-
+          transition_length: 0s
       - lambda: |-
-          id(screen_awake) = true;
+          id(last_touch_ms) = millis();
 
-      # after 5 mins return to idle state
-      - delay: 5min
-      - script.execute: screen_idle
-
-
-  # ---------- RETURN TO IDLE ----------
-  - id: screen_idle
+interval:
+  - interval: 5s
     then:
       - lambda: |-
+
           auto now = id(sntp_time).now();
           if (!now.is_valid()) return;
 
-          // night mode
-          if (now.hour >= 23 || now.hour < 6) {
-            id(display_backlight).turn_off().perform();
-            id(screen_awake) = false;
+          int hour = now.hour;
+
+          // NIGHT MODE (23:00 → 06:00)
+          if (hour >= 23 || hour < 6) {
+            auto call = id(display_backlight).turn_off();
+            call.perform();
             return;
           }
 
-      # daytime idle brightness
-      - light.turn_on:
-          id: display_backlight
-          brightness: 5%
-          transition_length: 800ms
+          // DAY MODE
+          uint32_t idle = millis() - id(last_touch_ms);
 
-      - lambda: |-
-          id(screen_awake) = false;
-  
+          const uint32_t ACTIVE_TIME = 5UL * 60UL * 1000UL;
+
+          if (idle < ACTIVE_TIME) {
+            // ACTIVE → 100%
+            auto call = id(display_backlight).turn_on();
+            call.set_brightness(1.0f);
+            call.perform();
+          } else {
+            // AMBIENT → 5%
+            auto call = id(display_backlight).turn_on();
+            call.set_brightness(0.05f);
+            call.perform();
+          }
 # Power management
 esp_ldo:
   - channel: 3
@@ -161,7 +160,7 @@ touchscreen:
     i2c_id: bus_a
     reset_pin: GPIO22
     interrupt_pin: GPIO21
-    on_press:
+    on_touch:
       then:
         - script.execute: screen_wake
 
