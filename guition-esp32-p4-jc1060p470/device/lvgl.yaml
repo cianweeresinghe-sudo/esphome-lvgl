@@ -86,12 +86,11 @@ lvgl:
                   service: light.toggle
                   data: { entity_id: light.garden_lights }
 
-        # ---------- THERMOSTATS ----------
-        # Living: tile with compact +/- controls
+        # ---------- THERMOSTATS (fixed-size, grid-friendly) ----------
         - button:
             styles: control
-            width: 220
-            height: 140
+            width: 210
+            height: 120
             widgets:
               - label:
                   text: "Living"
@@ -103,18 +102,15 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
 
-              # Minus
               - button:
-                  width: 44
-                  height: 36
+                  width: 42
+                  height: 34
                   align: bottom_left
                   x: 8
                   y: -8
                   radius: 6
                   widgets:
-                    - label:
-                        text: "-"
-                        align: center
+                    - label: { text: "-", align: center }
                   on_click:
                     - if:
                         condition:
@@ -127,18 +123,15 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(living_target_temp).state - 0.5;
 
-              # Plus
               - button:
-                  width: 44
-                  height: 36
+                  width: 42
+                  height: 34
                   align: bottom_right
                   x: -8
                   y: -8
                   radius: 6
                   widgets:
-                    - label:
-                        text: "+"
-                        align: center
+                    - label: { text: "+", align: center }
                   on_click:
                     - if:
                         condition:
@@ -151,15 +144,62 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(living_target_temp).state + 0.5;
 
-        # House: readout only
         - button:
             styles: control
+            width: 210
+            height: 120
             widgets:
-              - label: { text: "House" }
+              - label:
+                  text: "House"
+                  align: top_left
+
               - label:
                   id: house_target_label
-                  align: bottom_left
+                  align: center
                   text: "--.-°C"
+                  text_font: clockbar_font
+
+              - button:
+                  width: 42
+                  height: 34
+                  align: bottom_left
+                  x: 8
+                  y: -8
+                  radius: 6
+                  widgets:
+                    - label: { text: "-", align: center }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: 'return id(house_target_temp).has_state();'
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.wireless_temperature_sensor_x
+                                temperature: !lambda |-
+                                  return id(house_target_temp).state - 0.5;
+
+              - button:
+                  width: 42
+                  height: 34
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  radius: 6
+                  widgets:
+                    - label: { text: "+", align: center }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: 'return id(house_target_temp).has_state();'
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.wireless_temperature_sensor_x
+                                temperature: !lambda |-
+                                  return id(house_target_temp).state + 0.5;
 
         # ---------- ENERGY ----------
         - button:
