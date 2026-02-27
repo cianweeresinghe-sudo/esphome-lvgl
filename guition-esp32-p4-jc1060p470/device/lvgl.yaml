@@ -89,15 +89,51 @@ lvgl:
 
 
         # ---------- THERMOSTATS ----------
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Living" }
-              - label:
-                  id: living_target_label
-                  align: bottom_left
-                  text: "--.-°C"
+- button:
+    styles: control
+    widgets:
 
+      # Title
+      - label:
+          text: "Living"
+
+      # Current temperature
+      - label:
+          id: living_target_label
+          align: center
+          text: "--.-°C"
+
+      # MINUS BUTTON
+      - button:
+          width: 60
+          height: 50
+          align: bottom_left
+          widgets:
+            - label:
+                text: "-"
+          on_click:
+            - homeassistant.service:
+                service: climate.set_temperature
+                data:
+                  entity_id: climate.smart_radiator_thermostat_x
+                  temperature: !lambda |-
+                    return id(living_target_temp).state - 0.5;
+
+      # PLUS BUTTON
+      - button:
+          width: 60
+          height: 50
+          align: bottom_right
+          widgets:
+            - label:
+                text: "+"
+          on_click:
+            - homeassistant.service:
+                service: climate.set_temperature
+                data:
+                  entity_id: climate.smart_radiator_thermostat_x
+                  temperature: !lambda |-
+                    return id(living_target_temp).state + 0.5;
         - button:
             styles: control
             widgets:
