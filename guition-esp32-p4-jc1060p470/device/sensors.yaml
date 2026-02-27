@@ -4,19 +4,27 @@
 
 sensor:
 
-  # ---------- HEADER TEMPS ----------
+  # Header Outdoor Temperate
   - platform: homeassistant
-    id: header_indoor_temp
     entity_id: sensor.family_s_echo_temperature
+    id: office_temperature
     on_value:
-      - script.execute: update_header_temp
+      - lvgl.label.update:
+          id: temperatures
+          text:
+            format: "%d° / %d°"
+            args: [ '(int)round(id(outdoor_temperature).state)', '(int)round(x)' ]
 
   - platform: homeassistant
-    id: header_outdoor_temp
     entity_id: weather.forecast_home
     attribute: temperature
+    id: outdoor_temperature
     on_value:
-      - script.execute: update_header_temp
+      - lvgl.label.update:
+          id: temperatures
+          text:
+            format: "%d° / %d°"
+            args: [ '(int)round(x)', '(int)round(id(office_temperature).state)' ]
 
 
   # ---------- TADO TARGET TEMPS ----------
@@ -142,19 +150,3 @@ binary_sensor:
 # SCRIPTS
 ##################################################
 
-script:
-  - id: update_header_temp
-    then:
-      - lambda: |-
-          if (!id(header_indoor_temp).has_state() || !id(header_outdoor_temp).has_state()) return;
-          char buf[32];
-          snprintf(buf, sizeof(buf), "%d° / %d°",
-                   (int) round(id(header_indoor_temp).state),
-                   (int) round(id(header_outdoor_temp).state));
-          lv_label_set_text(id(temperatures), buf);
-
-  - id: update_weather_ui
-    then:
-      - lambda: |-
-          if (!id(weather_condition).has_state()) return;
-          lv_label_set_text(id(weather_label), id(weather_condition).state.c_str());
