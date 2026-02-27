@@ -112,49 +112,7 @@ lvgl:
                   text: "--.-°C"
                   text_font: clockbar_font
                   align: center
-
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_left
-                  x: 8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "-", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(living_target_temp).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x
-                                temperature: !lambda |-
-                                  return id(living_target_temp).state - 0.5;
-
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_right
-                  x: -8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "+", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(living_target_temp).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x
-                                temperature: !lambda |-
-                                  return id(living_target_temp).state + 0.5;
-
+            
         - button:
             styles: control
             width: 210
@@ -169,47 +127,7 @@ lvgl:
                   text_font: clockbar_font
                   align: center
 
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_left
-                  x: 8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "-", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(house_target_temp).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.wireless_temperature_sensor_x
-                                temperature: !lambda |-
-                                  return id(house_target_temp).state - 0.5;
-
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_right
-                  x: -8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "+", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(house_target_temp).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.wireless_temperature_sensor_x
-                                temperature: !lambda |-
-                                  return id(house_target_temp).state + 0.5;
+         
 
         # ---------------- ENERGY ----------------
         - button:
@@ -357,48 +275,4 @@ lvgl:
                   align: center
                   text_font: clockbar_font
 
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_left
-                  x: 8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "-", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(kitchen_volume).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: media_player.volume_set
-                              data:
-                                entity_id: media_player.kitchen
-                                volume_level: !lambda |-
-                                  float v = id(kitchen_volume).state - 0.05f;
-                                  if (v < 0.0f) v = 0.0f;
-                                  return v;
-
-              - button:
-                  width: 42
-                  height: 34
-                  align: bottom_right
-                  x: -8
-                  y: -8
-                  radius: 6
-                  widgets:
-                    - label: { text: "+", align: center }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: 'return id(kitchen_volume).has_state();'
-                        then:
-                          - homeassistant.service:
-                              service: media_player.volume_set
-                              data:
-                                entity_id: media_player.kitchen
-                                volume_level: !lambda |-
-                                  float v = id(kitchen_volume).state + 0.05f;
-                                  if (v > 1.0f) v = 1.0f;
-                                  return v;
+            
