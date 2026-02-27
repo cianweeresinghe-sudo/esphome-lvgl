@@ -2,13 +2,18 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+##################################################
+# TOP BAR
+##################################################
+
   top_layer:
     widgets:
+
       - label:
           id: temperatures
           text: "--° / --°"
           align: top_left
-          x: 8
+          x: 10
           y: 8
 
       - label:
@@ -18,133 +23,84 @@ lvgl:
           y: 8
 
 
+##################################################
+# DASHBOARD PAGE
+##################################################
+
   pages:
-    - id: home_summary_page
+    - id: dashboard_page
       layout:
         type: flex
-        flex_flow: column_wrap
-        pad_row: 10
-        pad_column: 10
+        flex_flow: row_wrap
+        pad_row: 14
+        pad_column: 14
       width: 100%
       bg_color: black
-      pad_top: 42
+      pad_top: 40
 
       widgets:
 
-        # ---------- LIGHTS ----------
-        - button:
-            id: living_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Living" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.living_room }
-
-        - button:
-            id: hall_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Hall" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.hall }
-
-        - button:
-            id: downstairs_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Downstairs" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.downstairs }
-
-        - button:
-            id: garden_light_btn
-            checkable: true
-            styles: control
-            widgets:
-              - label: { text: "Garden" }
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data: { entity_id: light.garden_lights }
-
-
-        # ---------- THERMOSTATS ----------
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Living" }
-              - label:
-                  id: living_target_label
-                  align: bottom_left
-                  text: "--.-°C"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "House" }
-              - label:
-                  id: house_target_label
-                  align: bottom_left
-                  text: "--.-°C"
-
-
-        # ---------- ENERGY ----------
-        - button:
-            styles: control
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
             widgets:
               - label: { text: "Solar" }
               - label:
-                  id: solar_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Usage" }
-              - label:
-                  id: usage_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - button:
-            styles: control
-            widgets:
-              - label: { text: "Car" }
-              - label:
-                  id: car_label
-                  align: bottom_left
-                  text: "--%"
-
-
-        # ---------- WEATHER ----------
-        - button:
-            styles: control
-            widgets:
-              - label:
-                  id: weather_icon
-                  text_font: icon_font   # ✅ correct font
-                  text: "\uF059"
-
-              - label:
-                  id: weather_label
+                  id: solar_value
                   align: bottom_left
                   text: "--"
 
-        - button:
-            styles: control
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Car Battery" }
+              - label:
+                  id: car_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
             widgets:
               - label: { text: "Rain" }
               - label:
-                  id: rain_label
+                  id: rain_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Weather" }
+              - label:
+                  id: weather_value
                   align: bottom_left
                   text: "--"
