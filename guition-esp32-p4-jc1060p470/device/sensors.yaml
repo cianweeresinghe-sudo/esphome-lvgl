@@ -1,96 +1,90 @@
 ##################################################
-# HOME ASSISTANT SENSORS
+# TEMPERATURE HEADER
 ##################################################
 
 sensor:
 
-##################################################
-# HEADER TEMPERATURES
-##################################################
-
   - platform: homeassistant
-    id: header_indoor_temp
+    id: indoor_temp
     entity_id: sensor.family_s_echo_temperature
     on_value:
-      - script.execute: update_header_temp
+      - script.execute: update_header
 
   - platform: homeassistant
-    id: header_outdoor_temp
+    id: outdoor_temp
     entity_id: weather.forecast_home
     on_value:
-      - script.execute: update_header_temp
+      - script.execute: update_header
 
 
 ##################################################
-# LIGHT BRIGHTNESS
+# ENERGY
 ##################################################
 
   - platform: homeassistant
-    id: living_brightness
-    entity_id: light.living_room
-    attribute: brightness
-    internal: true
+    entity_id: sensor.solar_daily_production_kwh
+    on_value:
+      - lvgl.label.update:
+          id: solar_value
+          text:
+            format: "%.1f kWh"
+            args: ['x']
 
   - platform: homeassistant
-    id: hall_brightness
-    entity_id: light.hall
-    attribute: brightness
-    internal: true
+    entity_id: sensor.envoy_122429013109_energy_consumption_today
+    on_value:
+      - lvgl.label.update:
+          id: usage_value
+          text:
+            format: "%.1f kWh"
+            args: ['x']
 
   - platform: homeassistant
-    id: downstairs_brightness
-    entity_id: light.downstairs
-    attribute: brightness
-    internal: true
-
-  - platform: homeassistant
-    id: garden_brightness
-    entity_id: light.garden_lights
-    attribute: brightness
-    internal: true
+    entity_id: sensor.ky22mdv_battery
+    on_value:
+      - lvgl.label.update:
+          id: car_value
+          text:
+            format: "%.0f %%"
+            args: ['x']
 
 
 ##################################################
-# TADO TARGET TEMPERATURES
+# TEXT SENSORS
 ##################################################
+
+text_sensor:
 
   - platform: homeassistant
-    id: living_target_temp
-    entity_id: climate.smart_radiator_thermostat_x
-    attribute: temperature
+    entity_id: sensor.rain_status_text
+    on_value:
+      - lvgl.label.update:
+          id: rain_value
+          text: !lambda return x;
 
   - platform: homeassistant
-    id: house_target_temp
-    entity_id: climate.wireless_temperature_sensor_x
-    attribute: temperature
+    entity_id: weather.forecast_home
+    on_value:
+      - lvgl.label.update:
+          id: weather_value
+          text: !lambda return x;
 
 
 ##################################################
-# SONOS VOLUME
-##################################################
-
-  - platform: homeassistant
-    id: kitchen_volume
-    entity_id: media_player.kitchen
-    attribute: volume_level
-
-
-##################################################
-# SCRIPTS
+# HEADER UPDATE
 ##################################################
 
 script:
-
-  - id: update_header_temp
+  - id: update_header
     then:
       - lambda: |-
-          if (!id(header_indoor_temp).has_state() ||
-              !id(header_outdoor_temp).has_state())
+          if (!id(indoor_temp).has_state() ||
+              !id(outdoor_temp).has_state())
             return;
 
           char buf[32];
           snprintf(buf,sizeof(buf),"%d° / %d°",
-            (int)round(id(header_indoor_temp).state),
-            (int)round(id(header_outdoor_temp).state));
+            (int)round(id(indoor_temp).state),
+            (int)round(id(outdoor_temp).state));
 
           lv_label_set_text(id(temperatures), buf);
