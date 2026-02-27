@@ -8,11 +8,12 @@ lvgl:
 
   top_layer:
     widgets:
+
       - label:
           id: temperatures
           text: "--° / --°"
           align: top_left
-          x: 8
+          x: 10
           y: 8
 
       - label:
@@ -23,203 +24,87 @@ lvgl:
 
 
 ##################################################
-# MAIN PAGE
+# DASHBOARD
 ##################################################
 
   pages:
-    - id: home_summary_page
+    - id: main
       layout:
         type: flex
         flex_flow: row_wrap
-        pad_row: 12
-        pad_column: 12
+        pad_row: 14
+        pad_column: 14
       width: 100%
       bg_color: black
-      pad_top: 42
+      pad_top: 40
 
       widgets:
 
 ##################################################
-# LIVING LIGHT
+# TILE TEMPLATE STYLE
 ##################################################
 
         - obj:
-            width: 150
-            height: 120
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-
-              - label:
-                  text: "Living Light"
-                  align: top_mid
-
-              - button:
-                  width: 50
-                  height: 50
-                  align: bottom_left
-                  widgets:
-                    - label: { text: "-" }
-                  on_click:
-                    - homeassistant.service:
-                        service: light.turn_on
-                        data:
-                          entity_id: light.living_room
-                          brightness: !lambda return max(1,(int)id(living_brightness).state - 25);
-
-              - button:
-                  width: 50
-                  height: 50
-                  align: bottom_right
-                  widgets:
-                    - label: { text: "+" }
-                  on_click:
-                    - homeassistant.service:
-                        service: light.turn_on
-                        data:
-                          entity_id: light.living_room
-                          brightness: !lambda return min(255,(int)id(living_brightness).state + 25);
-
-##################################################
-# THERMOSTAT
-##################################################
-
-        - obj:
-            width: 150
-            height: 120
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-
-              - label:
-                  text: "Heating"
-
-              - button:
-                  align: bottom_left
-                  widgets:
-                    - label: { text: "-" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.smart_radiator_thermostat_x
-                          temperature: !lambda return id(living_target_temp).state - 0.5;
-
-              - button:
-                  align: bottom_right
-                  widgets:
-                    - label: { text: "+" }
-                  on_click:
-                    - homeassistant.service:
-                        service: climate.set_temperature
-                        data:
-                          entity_id: climate.smart_radiator_thermostat_x
-                          temperature: !lambda return id(living_target_temp).state + 0.5;
-
-##################################################
-# SONOS
-##################################################
-
-        - obj:
-            width: 150
-            height: 120
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-
-              - label:
-                  text: "Kitchen Audio"
-
-              - button:
-                  align: bottom_left
-                  widgets:
-                    - label: { text: "-" }
-                  on_click:
-                    - homeassistant.service:
-                        service: media_player.volume_set
-                        data:
-                          entity_id: media_player.kitchen
-                          volume_level: !lambda return max(0.0f,id(kitchen_volume).state - 0.05f);
-
-              - button:
-                  align: bottom_right
-                  widgets:
-                    - label: { text: "+" }
-                  on_click:
-                    - homeassistant.service:
-                        service: media_player.volume_set
-                        data:
-                          entity_id: media_player.kitchen
-                          volume_level: !lambda return min(1.0f,id(kitchen_volume).state + 0.05f);
-
-##################################################
-# STATUS TILES
-##################################################
-
-        - obj:
-            width: 150
+            width: 160
             height: 90
             bg_color: 0x1E1E1E
-            radius: 12
+            radius: 10
             pad_all: 10
             widgets:
               - label: { text: "Solar" }
               - label:
-                  id: solar_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - obj:
-            width: 150
-            height: 90
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-              - label: { text: "Usage" }
-              - label:
-                  id: usage_label
-                  align: bottom_left
-                  text: "-- kWh"
-
-        - obj:
-            width: 150
-            height: 90
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-              - label: { text: "Car" }
-              - label:
-                  id: car_label
-                  align: bottom_left
-                  text: "-- %"
-
-        - obj:
-            width: 150
-            height: 90
-            bg_color: 0x1E1E1E
-            radius: 12
-            pad_all: 10
-            widgets:
-              - label: { text: "Rain" }
-              - label:
-                  id: rain_label
+                  id: solar_value
                   align: bottom_left
                   text: "--"
 
         - obj:
-            width: 150
+            width: 160
             height: 90
             bg_color: 0x1E1E1E
-            radius: 12
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Usage" }
+              - label:
+                  id: usage_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Car Battery" }
+              - label:
+                  id: car_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
+            pad_all: 10
+            widgets:
+              - label: { text: "Rain" }
+              - label:
+                  id: rain_value
+                  align: bottom_left
+                  text: "--"
+
+        - obj:
+            width: 160
+            height: 90
+            bg_color: 0x1E1E1E
+            radius: 10
             pad_all: 10
             widgets:
               - label: { text: "Weather" }
               - label:
-                  id: weather_label
+                  id: weather_value
                   align: bottom_left
                   text: "--"
