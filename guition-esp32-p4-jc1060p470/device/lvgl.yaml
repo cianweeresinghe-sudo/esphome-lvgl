@@ -247,3 +247,145 @@ lvgl:
                   id: rain_label
                   align: bottom_left
                   text: "--"
+              # ---------- SONOS / MEDIA ----------
+
+        # Radio 1
+        - button:
+            styles: control
+            width: 210
+            height: 120
+            widgets:
+              - label:
+                  text_font: icon_font
+                  text: $radio
+                  align: top_left
+              - label:
+                  text: "Radio 1"
+                  align: bottom_left
+            on_click:
+              - homeassistant.service:
+                  service: script.turn_on
+                  data:
+                    entity_id: script.sonos_favourite_radio_1
+
+        # Radio 2
+        - button:
+            styles: control
+            width: 210
+            height: 120
+            widgets:
+              - label:
+                  text_font: icon_font
+                  text: $radio
+                  align: top_left
+              - label:
+                  text: "Radio 2"
+                  align: bottom_left
+            on_click:
+              - homeassistant.service:
+                  service: script.turn_on
+                  data:
+                    entity_id: script.sonos_favourite_radio_2
+
+        # Now Playing (read-only tile)
+        - button:
+            styles: control
+            width: 210
+            height: 120
+            widgets:
+              - label:
+                  text_font: icon_font
+                  text: $sonos
+                  align: top_left
+              - label:
+                  text: "Now"
+                  align: top_left
+                  x: 60
+              - label:
+                  id: now_playing_label
+                  text: "--"
+                  align: bottom_left
+
+        # Play / Pause
+        - button:
+            styles: control
+            width: 210
+            height: 120
+            widgets:
+              - label:
+                  text_font: icon_font
+                  text: $playpause
+                  align: top_left
+              - label:
+                  id: play_state_label
+                  text: "Play/Pause"
+                  align: bottom_left
+            on_click:
+              - homeassistant.service:
+                  service: media_player.media_play_pause
+                  data:
+                    entity_id: media_player.kitchen
+
+        # Volume (tile with - / +)
+        - button:
+            styles: control
+            width: 210
+            height: 120
+            widgets:
+              - label:
+                  text_font: icon_font
+                  text: $volume
+                  align: top_left
+              - label:
+                  id: volume_label
+                  text: "--%"
+                  align: center
+                  text_font: clockbar_font
+
+              # Vol -
+              - button:
+                  width: 42
+                  height: 34
+                  align: bottom_left
+                  x: 8
+                  y: -8
+                  radius: 6
+                  widgets:
+                    - label: { text: "-", align: center }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: 'return id(kitchen_volume).has_state();'
+                        then:
+                          - homeassistant.service:
+                              service: media_player.volume_set
+                              data:
+                                entity_id: media_player.kitchen
+                                volume_level: !lambda |-
+                                  float v = id(kitchen_volume).state - 0.05f;
+                                  if (v < 0.0f) v = 0.0f;
+                                  return v;
+
+              # Vol +
+              - button:
+                  width: 42
+                  height: 34
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  radius: 6
+                  widgets:
+                    - label: { text: "+", align: center }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: 'return id(kitchen_volume).has_state();'
+                        then:
+                          - homeassistant.service:
+                              service: media_player.volume_set
+                              data:
+                                entity_id: media_player.kitchen
+                                volume_level: !lambda |-
+                                  float v = id(kitchen_volume).state + 0.05f;
+                                  if (v > 1.0f) v = 1.0f;
+                                  return v;
