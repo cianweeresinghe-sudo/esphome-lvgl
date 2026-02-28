@@ -305,7 +305,6 @@ lvgl:
             width: 240
             height: 120
             widgets:
-              - label: { text_font: icon_font, text: $sonos, align: top_left }
               - label: { text: "Now", align: bottom_left }
               - label:
                   id: now_playing_label
