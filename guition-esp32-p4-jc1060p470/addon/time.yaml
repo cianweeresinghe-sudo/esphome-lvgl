@@ -9,11 +9,29 @@ time:
      - 2.pool.ntp.org
     on_time_sync:
       - script.execute: time_update
+      - script.execute: screen_apply_idle_level
+
     on_time:
-      - minutes: '*'
-        seconds: 0
+      # ---- CLOCK UPDATE ----
+      - seconds: 0
+        minutes: /1
         then:
           - script.execute: time_update
+
+      # ---- NIGHT MODE ON (23:00) ----
+      - seconds: 0
+        minutes: 0
+        hours: 23
+        then:
+          - script.execute: screen_night_mode
+
+      # ---- DAY MODE ON (06:00) ----
+      - seconds: 0
+        minutes: 0
+        hours: 6
+        then:
+          - script.execute: screen_day_mode
+
 
 # Clock
 script:
