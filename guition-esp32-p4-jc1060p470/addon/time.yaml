@@ -12,7 +12,6 @@ time:
     on_time_sync:
       then:
         - script.execute: time_update
-        - script.execute: apply_idle_brightness
 
     # Update header clock every minute
     on_time:
@@ -21,21 +20,10 @@ time:
         then:
           - script.execute: time_update
 
-      # Re-evaluate brightness at 23:00
-      - seconds: 0
-        minutes: 0
-        hours: 23
-        then:
-          - script.execute: apply_idle_brightness
 
-      # Re-evaluate brightness at 06:00
-      - seconds: 0
-        minutes: 0
-        hours: 6
-        then:
-          - script.execute: apply_idle_brightness
-
-# Clock
+# ------------------------------------------------
+# CLOCK UPDATE SCRIPT (ONLY CLOCK NOW)
+# ------------------------------------------------
 script:
   - id: time_update
     then:
@@ -44,5 +32,6 @@ script:
           text: !lambda |-
             static char time_buf[17];
             auto now = id(sntp_time).now();
+            if (!now.is_valid()) return std::string("--:--");
             snprintf(time_buf, sizeof(time_buf), "%02d:%02d", now.hour, now.minute);
-            return time_buf;
+            return std::string(time_buf);
