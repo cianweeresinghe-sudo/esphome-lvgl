@@ -1,37 +1,39 @@
-# Snmp Time
 time:
   - platform: sntp
     id: sntp_time
-    timezone: Europe/London
-    servers:
-     - 0.pool.ntp.org
-     - 1.pool.ntp.org
-     - 2.pool.ntp.org
-    on_time_sync:
-      - script.execute: time_update
-      - script.execute: screen_apply_idle_level
+    timezone: "GMT0BST,M3.5.0/1,M10.5.0"
 
+    servers:
+      - 0.pool.ntp.org
+      - 1.pool.ntp.org
+      - 2.pool.ntp.org
+
+    # When time becomes valid after boot
+    on_time_sync:
+      then:
+        - script.execute: time_update
+        - script.execute: apply_idle_brightness
+
+    # Update header clock every minute
     on_time:
-      # ---- CLOCK UPDATE ----
       - seconds: 0
         minutes: /1
         then:
           - script.execute: time_update
 
-      # ---- NIGHT MODE ON (23:00) ----
+      # Re-evaluate brightness at 23:00
       - seconds: 0
         minutes: 0
         hours: 23
         then:
-          - script.execute: screen_night_mode
+          - script.execute: apply_idle_brightness
 
-      # ---- DAY MODE ON (06:00) ----
+      # Re-evaluate brightness at 06:00
       - seconds: 0
         minutes: 0
         hours: 6
         then:
-          - script.execute: screen_day_mode
-
+          - script.execute: apply_idle_brightness
 
 # Clock
 script:
