@@ -1,4 +1,8 @@
-# Designed for guition-esp32-p4-jc1060p470
+# =========================================================
+# guition-esp32-p4-jc1060p470 DEVICE CONFIG
+# Stable brightness + touch wake logic
+# =========================================================
+
 esp32:
   variant: esp32p4
   flash_size: 16MB
@@ -7,31 +11,40 @@ esp32:
     type: esp-idf
     advanced:
       enable_idf_experimental_features: true
-      disable_vfs_support_termios: false
-      disable_vfs_support_select: false
-      disable_vfs_support_dir: false
     sdkconfig_options:
-      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"   # Stop screen flashing during OTA
+      CONFIG_SPIRAM_XIP_FROM_PSRAM: "y"
       CONFIG_SDMMC_HOST_DEFAULT: "y"
 
-# Esphome
+# ---------------------------------------------------------
+# ESPHome
+# ---------------------------------------------------------
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   area: ${room}
 
-  # Set the correct idle brightness at boot (uses sntp_time from addon/time.yaml)
+  # wait for HA + time before applying brightness
   on_boot:
+    priority: -100
     then:
+      - delay: 10s
       - script.execute: apply_idle_brightness
 
+# ---------------------------------------------------------
 # External components
+# ---------------------------------------------------------
 external_components:
   - source: github://p1ngb4ck/esphome@dev
-    components: [audio, binary_storage, http_file_browser, nfs_client, picture_viewer, uart, usb_host, usb_uart, usb_storage, sd_storage, smb_client, storage, transcoder, video_player, webdav_server]
+    components:
+      [audio, binary_storage, http_file_browser, nfs_client,
+       picture_viewer, uart, usb_host, usb_uart, usb_storage,
+       sd_storage, smb_client, storage, transcoder,
+       video_player, webdav_server]
     refresh: 0s
 
-# Secondary ESP32-C6 device for connectivity
+# ---------------------------------------------------------
+# ESP32-C6 connectivity
+# ---------------------------------------------------------
 esp32_hosted:
   variant: esp32c6
   reset_pin: GPIO54
@@ -43,63 +56,59 @@ esp32_hosted:
   d3_pin: GPIO17
   active_high: true
 
-# Video memory
 psram:
   mode: hex
   speed: 200MHz
 
-# Over the Air Updates
 ota:
   platform: esphome
 
-# Enable Home Assistant API
 api:
-
-# Enable logging
 logger:
 
-# Power management
+# ---------------------------------------------------------
+# Power
+# ---------------------------------------------------------
 esp_ldo:
   - channel: 3
     id: dsi_phy_enable
     voltage: 2.5V
-    adjustable: True
   - channel: 4
     id: sd_card_power
     voltage: 2.7V
-    adjustable: True
 
-# Backlight PWM output
+# ---------------------------------------------------------
+# BACKLIGHT
+# ---------------------------------------------------------
 output:
   - platform: ledc
     pin: GPIO23
     id: gpio_backlight_pwm
 
-# Backlight light entity
 light:
   - platform: monochromatic
-    output: gpio_backlight_pwm
-    name: Display Backlight
-    icon: mdi:lightbulb-on
     id: display_backlight
+    name: Display Backlight
+    output: gpio_backlight_pwm
     restore_mode: ALWAYS_ON
-    default_transition_length: 0s
     gamma_correct: 1.0
+    default_transition_length: 0s
 
-# ----------------------------
-# Backlight behaviour
-# 23:00–06:00 => OFF
-# daytime idle => 5%
-# touch => 100% for 5 minutes, then idle again
-# ----------------------------
+# ---------------------------------------------------------
+# GLOBALS
+# ---------------------------------------------------------
 globals:
-  - id: last_touch_ms
-    type: uint32_t
+  - id: screen_awake
+    type: bool
     restore_value: no
-    initial_value: '0'
+    initial_value: "false"
 
+# ---------------------------------------------------------
+# BRIGHTNESS LOGIC
+# ---------------------------------------------------------
 script:
-  # Apply correct idle brightness for the current time
+
+  # ---------- APPLY IDLE BRIGHTNESS ----------
   - id: apply_idle_brightness
     mode: restart
     then:
@@ -107,41 +116,49 @@ script:
           auto now = id(sntp_time).now();
           if (!now.is_valid()) return;
 
-          const bool night = (now.hour >= 23 || now.hour < 6);
+          bool night = (now.hour >= 23 || now.hour < 6);
 
           if (night) {
             auto call = id(display_backlight).turn_off();
             call.perform();
-          } else {
-            auto call = id(display_backlight).turn_on();
-            call.set_brightness(0.05f);  // 5%
-            call.set_transition_length(0);
-            call.perform();
+            id(screen_awake) = false;
+            return;
           }
 
-  # Wake to 100% and schedule return to idle after 5 min
+          auto call = id(display_backlight).turn_on();
+          call.set_brightness(0.05f);   // 5%
+          call.set_transition_length(800);
+          call.perform();
+
+          id(screen_awake) = false;
+
+  # ---------- TOUCH WAKE ----------
   - id: screen_wake
     mode: restart
     then:
-      - lambda: |-
-          id(last_touch_ms) = millis();
+      - if:
+          condition:
+            lambda: "return !id(screen_awake);"
+          then:
+            - light.turn_on:
+                id: display_backlight
+                brightness: 100%
+                transition_length: 250ms
 
-      - light.turn_on:
-          id: display_backlight
-          brightness: 100%
-          transition_length: 0s
+      - lambda: |-
+          id(screen_awake) = true;
 
       - delay: 5min
       - script.execute: apply_idle_brightness
 
-# Touchscreen I2C
+# ---------------------------------------------------------
+# TOUCHSCREEN
+# ---------------------------------------------------------
 i2c:
   - id: bus_a
     sda: GPIO07
     scl: GPIO08
     frequency: 400kHz
-    sda_pullup_enabled: False
-    scl_pullup_enabled: False
 
 i2c_device:
   - id: i2cdev1
@@ -153,7 +170,6 @@ i2c_device:
   - id: i2cdev4
     address: 0x40
 
-# Touchscreen
 touchscreen:
   - platform: gt911
     id: my_touchscreen
@@ -164,7 +180,9 @@ touchscreen:
       then:
         - script.execute: screen_wake
 
-# Display
+# ---------------------------------------------------------
+# DISPLAY
+# ---------------------------------------------------------
 display:
   - platform: mipi_dsi
     id: my_display
@@ -175,4 +193,4 @@ display:
     rotation: 0
     update_interval: never
     auto_clear_enabled: false
-    hsync_pulse_width: 20     # The only difference to the examples provided
+    hsync_pulse_width: 20
