@@ -56,6 +56,28 @@ sensor:
             format: "%.1f°C"
             args: ["x"]
 
+  - platform: homeassistant
+    id: rowan_target_temp
+    entity_id: climate.smart_radiator_thermostat_x_2
+    attribute: temperature
+    on_value:
+      - lvgl.label.update:
+          id: rowan_target_label
+          text:
+            format: "%.1f°C"
+            args: ["x"]
+
+  - platform: homeassistant
+    id: maes_target_temp
+    entity_id: climate.smart_radiator_thermostat_x_3
+    attribute: temperature
+    on_value:
+      - lvgl.label.update:
+          id: maes_target_label
+          text:
+            format: "%.1f°C"
+            args: ["x"]
+
   # -------- Energy / car --------
   - platform: homeassistant
     id: solar_today
