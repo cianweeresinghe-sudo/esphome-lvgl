@@ -213,6 +213,120 @@ lvgl:
                                 temperature: !lambda |-
                                   return id(house_target_temp).state - 0.5;
 
+        # Rowan room (tile + +/- controls)
+        - obj:
+            styles: control
+            width: 240
+            height: 120
+            pad_all: 0
+            border_width: 0
+            widgets:
+              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
+              - label: { text: "Rowan room", align: bottom_left, x: 10, y: -8 }
+
+              - label:
+                  id: rowan_target_label
+                  text: "--.-°C"
+                  text_font: clockbar_font
+                  align: center
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: top_right
+                  x: -8
+                  y: 8
+                  widgets:
+                    - label: { text: "+", text_font: label_font }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: return id(rowan_target_temp).has_state();
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.smart_radiator_thermostat_x_2
+                                temperature: !lambda |-
+                                  return id(rowan_target_temp).state + 0.5;
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  widgets:
+                    - label: { text: "-", text_font: label_font }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: return id(rowan_target_temp).has_state();
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.smart_radiator_thermostat_x_2
+                                temperature: !lambda |-
+                                  return id(rowan_target_temp).state - 0.5;
+
+        # Maes (tile + +/- controls)
+        - obj:
+            styles: control
+            width: 240
+            height: 120
+            pad_all: 0
+            border_width: 0
+            widgets:
+              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
+              - label: { text: "Maes", align: bottom_left, x: 10, y: -8 }
+
+              - label:
+                  id: maes_target_label
+                  text: "--.-°C"
+                  text_font: clockbar_font
+                  align: center
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: top_right
+                  x: -8
+                  y: 8
+                  widgets:
+                    - label: { text: "+", text_font: label_font }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: return id(maes_target_temp).has_state();
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.smart_radiator_thermostat_x_3
+                                temperature: !lambda |-
+                                  return id(maes_target_temp).state + 0.5;
+
+              - button:
+                  width: 52
+                  height: 52
+                  align: bottom_right
+                  x: -8
+                  y: -8
+                  widgets:
+                    - label: { text: "-", text_font: label_font }
+                  on_click:
+                    - if:
+                        condition:
+                          lambda: return id(maes_target_temp).has_state();
+                        then:
+                          - homeassistant.service:
+                              service: climate.set_temperature
+                              data:
+                                entity_id: climate.smart_radiator_thermostat_x_3
+                                temperature: !lambda |-
+                                  return id(maes_target_temp).state - 0.5;
+
         # ---------------- ENERGY ----------------
         - button:
             styles: control
@@ -290,118 +404,6 @@ lvgl:
                   y: -8
 
         # ---------------- SONOS / MEDIA ----------------
-        - obj:
-            styles: control
-            width: 240
-            height: 120
-            pad_all: 0
-            border_width: 0
-            widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
-              - label: { text: "Rowan room", align: bottom_left, x: 10, y: -8 }
-
-              - label:
-                  id: rowan_target_label
-                  text: "--.-°C"
-                  text_font: clockbar_font
-                  align: center
-
-              - button:
-                  width: 52
-                  height: 52
-                  align: top_right
-                  x: -8
-                  y: 8
-                  widgets:
-                    - label: { text: "+", text_font: label_font }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: return id(rowan_target_temp).has_state();
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x_2
-                                temperature: !lambda |-
-                                  return id(rowan_target_temp).state + 0.5;
-
-              - button:
-                  width: 52
-                  height: 52
-                  align: bottom_right
-                  x: -8
-                  y: -8
-                  widgets:
-                    - label: { text: "-", text_font: label_font }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: return id(rowan_target_temp).has_state();
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x_2
-                                temperature: !lambda |-
-                                  return id(rowan_target_temp).state - 0.5;
-
-        - obj:
-            styles: control
-            width: 240
-            height: 120
-            pad_all: 0
-            border_width: 0
-            widgets:
-              - label: { text_font: icon_font, text: $climate, align: top_left, x: 10, y: 8 }
-              - label: { text: "Maes", align: bottom_left, x: 10, y: -8 }
-
-              - label:
-                  id: maes_target_label
-                  text: "--.-°C"
-                  text_font: clockbar_font
-                  align: center
-
-              - button:
-                  width: 52
-                  height: 52
-                  align: top_right
-                  x: -8
-                  y: 8
-                  widgets:
-                    - label: { text: "+", text_font: label_font }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: return id(maes_target_temp).has_state();
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x_3
-                                temperature: !lambda |-
-                                  return id(maes_target_temp).state + 0.5;
-
-              - button:
-                  width: 52
-                  height: 52
-                  align: bottom_right
-                  x: -8
-                  y: -8
-                  widgets:
-                    - label: { text: "-", text_font: label_font }
-                  on_click:
-                    - if:
-                        condition:
-                          lambda: return id(maes_target_temp).has_state();
-                        then:
-                          - homeassistant.service:
-                              service: climate.set_temperature
-                              data:
-                                entity_id: climate.smart_radiator_thermostat_x_3
-                                temperature: !lambda |-
-                                  return id(maes_target_temp).state - 0.5;
-
         - button:
             styles: control
             width: 240
