@@ -87,6 +87,32 @@ light:
     gamma_correct: 1.0
     default_transition_length: 0s
 
+number:
+  - platform: template
+    id: idle_brightness_pct
+    name: "Idle Brightness"
+    min_value: 5
+    max_value: 50
+    step: 5
+    initial_value: 15
+    restore_value: true
+    optimistic: true
+    mode: slider
+    entity_category: config
+    set_action:
+      - lambda: |-
+          auto now = id(sntp_time).now();
+          if (!now.is_valid()) return;
+
+          bool night = (now.hour >= 23 || now.hour < 6);
+          bool awake = millis() < id(screen_awake_until);
+          if (night || awake) return;
+
+          auto call = id(display_backlight).make_call();
+          call.set_state(true);
+          call.set_brightness(x / 100.0f);
+          call.perform();
+
 # ---------------------------------------------------------
 # GLOBAL STATE (NO DELAYS)
 # ---------------------------------------------------------
@@ -135,7 +161,7 @@ interval:
           }
           else {
             call.set_state(true);
-            call.set_brightness(0.25f);   // 25% idle
+            call.set_brightness(id(idle_brightness_pct).state / 100.0f);
           }
 
           call.perform();
