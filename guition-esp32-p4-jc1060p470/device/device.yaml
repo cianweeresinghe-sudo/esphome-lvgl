@@ -135,7 +135,7 @@ interval:
           }
           else {
             call.set_state(true);
-            call.set_brightness(0.05f);   // 5% idle
+            call.set_brightness(0.25f);   // 25% idle
           }
 
           call.perform();
